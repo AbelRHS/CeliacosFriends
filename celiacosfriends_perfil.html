@@ -953,26 +953,34 @@
         <div class="panel-card">
           <div class="panel-title">🏅 Mis insignias <span style="font-size:0.72rem;color:var(--text-light);font-weight:600;margin-left:4px;">· toca una para destacarla</span></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="insignias-grid">
-            <div class="insignia-item" data-emoji="🌾" data-nombre="Miembro Celiaco" onclick="seleccionarInsignia(this)" title="Miembro Celiaco: perteneces a la comunidad celiaca">
-              <div style="font-size:1.8rem;margin-bottom:4px">🌾</div>
+            <div class="insignia-item" data-emoji="💪" data-nombre="Miembro Celiaco" onclick="seleccionarInsignia(this)" title="Miembro Celiaco: perteneces a la comunidad celiaca">
+              <img src="INSIGNIAS/2mc.png" alt="Miembro Celiaco" style="width:2rem;height:2rem;object-fit:contain;margin-bottom:4px;">
               <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Miembro Celiaco</div>
             </div>
-            <div class="insignia-item" data-emoji="🥇" data-nombre="Miembro fundador" data-restringida="fundador" onclick="abrirModalFundador(this)" title="Miembro fundador: insignia exclusiva — haz clic para verificar">
-              <div style="font-size:1.8rem;margin-bottom:4px">🥇</div>
+            <div class="insignia-item" data-emoji="👑" data-nombre="Miembro fundador" data-restringida="fundador" onclick="abrirModalFundador(this)" title="Miembro fundador: insignia exclusiva — haz clic para verificar">
+              <img src="INSIGNIAS/1mf.png" alt="Miembro Fundador" style="width:2rem;height:2rem;object-fit:contain;margin-bottom:4px;">
               <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Miembro fundador</div>
               <div id="fundador-lock-icon" style="font-size:0.65rem;color:#cc6600;font-weight:700;margin-top:2px;display:none;">🔒 Verificación</div>
             </div>
-            <div class="insignia-item" data-emoji="👨‍🍳" data-nombre="Chef celiaco" onclick="seleccionarInsignia(this)" title="Chef celiaco: 10+ recetas publicadas">
-              <div style="font-size:1.8rem;margin-bottom:4px">👨‍🍳</div>
-              <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Chef celiaco</div>
+            <div class="insignia-item" data-emoji="🏰" data-nombre="Familiar Celiaco" onclick="seleccionarInsignia(this)" title="Familiar Celiaco: familiar directo de una persona celiaca">
+              <img src="INSIGNIAS/3fc.png" alt="Familiar Celiaco" style="width:2rem;height:2rem;object-fit:contain;margin-bottom:4px;">
+              <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Familiar Celiaco</div>
             </div>
-            <div class="insignia-item" data-emoji="✈️" data-nombre="Viajero" onclick="seleccionarInsignia(this)" title="Viajero: 5+ viajes registrados">
-              <div style="font-size:1.8rem;margin-bottom:4px">✈️</div>
-              <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Viajero</div>
+            <div class="insignia-item" data-emoji="🤝" data-nombre="Amigo Celiaco" onclick="seleccionarInsignia(this)" title="Amigo Celiaco: amigo comprometido con la comunidad celiaca">
+              <img src="INSIGNIAS/4ac.png" alt="Amigo Celiaco" style="width:2rem;height:2rem;object-fit:contain;margin-bottom:4px;">
+              <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Amigo Celiaco</div>
             </div>
-            <div class="insignia-item" data-emoji="❤️" data-nombre="Popular" onclick="seleccionarInsignia(this)" title="Popular: más de 500 likes recibidos">
-              <div style="font-size:1.8rem;margin-bottom:4px">❤️</div>
-              <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Popular</div>
+            <div class="insignia-item" data-emoji="👨‍🍳" data-nombre="Chef Celiaco" onclick="seleccionarInsignia(this)" title="Chef Celiaco: 10+ recetas publicadas">
+              <img src="INSIGNIAS/5cc.png" alt="Chef Celiaco" style="width:2rem;height:2rem;object-fit:contain;margin-bottom:4px;">
+              <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Chef Celiaco</div>
+            </div>
+            <div class="insignia-item" data-emoji="🧭" data-nombre="Viajero Celiaco" onclick="seleccionarInsignia(this)" title="Viajero Celiaco: 5+ viajes registrados">
+              <img src="INSIGNIAS/6vc.png" alt="Viajero Celiaco" style="width:2rem;height:2rem;object-fit:contain;margin-bottom:4px;">
+              <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Viajero Celiaco</div>
+            </div>
+            <div class="insignia-item" data-emoji="💚" data-nombre="Popular Celiaco" onclick="seleccionarInsignia(this)" title="Popular Celiaco: más de 500 likes recibidos">
+              <img src="INSIGNIAS/7pc.png" alt="Popular Celiaco" style="width:2rem;height:2rem;object-fit:contain;margin-bottom:4px;">
+              <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Popular Celiaco</div>
             </div>
           </div>
         </div>
@@ -2748,7 +2756,7 @@ function verificarFundador() {
     if (_fundadorInsigniaEl || document.querySelector('.insignia-item[data-restringida="fundador"]')) {
       seleccionarInsignia(_fundadorInsigniaEl || document.querySelector('.insignia-item[data-restringida="fundador"]'));
     }
-    toast('🥇 ¡Bienvenido, Miembro fundador! Insignia desbloqueada.');
+    toast('👑 ¡Bienvenido, Miembro fundador! Insignia desbloqueada.');
   } else {
     // Incorrecto — mostrar error y sacudir input
     if (err) err.style.display = '';
@@ -2786,18 +2794,39 @@ function _aplicarEstadoFundador(verificado) {
   }
 }
 
+// Mapa de emoji → archivo de insignia
+const _INSIGNIA_IMG = {
+  '👑': 'INSIGNIAS/1mf.png',
+  '💪': 'INSIGNIAS/2mc.png',
+  '🏰': 'INSIGNIAS/3fc.png',
+  '🤝': 'INSIGNIAS/4ac.png',
+  '👨‍🍳': 'INSIGNIAS/5cc.png',
+  '🧭': 'INSIGNIAS/6vc.png',
+  '💚': 'INSIGNIAS/7pc.png',
+};
+
+function _setInsigniaEnPerfil(emoji, nombre) {
+  const pjoin = document.getElementById('pjoin-insignia');
+  if (!pjoin) return;
+  const src = _INSIGNIA_IMG[emoji];
+  if (src) {
+    pjoin.innerHTML = '<img src="' + src + '" alt="' + nombre + '" style="width:1.1em;height:1.1em;object-fit:contain;vertical-align:middle;margin-right:4px;">' + nombre;
+  } else {
+    pjoin.textContent = emoji + ' ' + nombre;
+  }
+}
+
 function seleccionarInsignia(el) {
   // Quitar selección previa
   document.querySelectorAll('.insignia-item').forEach(i => i.classList.remove('selected'));
   el.classList.add('selected');
   const emoji  = el.dataset.emoji;
   const nombre = el.dataset.nombre;
-  // Actualizar el texto en el perfil
-  const pjoin = document.getElementById('pjoin-insignia');
-  if (pjoin) pjoin.textContent = emoji + ' ' + nombre;
+  // Actualizar insignia destacada en el perfil
+  _setInsigniaEnPerfil(emoji, nombre);
   // Guardar en localStorage
   try { localStorage.setItem('cf_insignia_destacada', JSON.stringify({ emoji, nombre })); } catch(e) {}
-  toast('✅ Insignia destacada: ' + emoji + ' ' + nombre);
+  toast('✅ Insignia destacada: ' + nombre);
 }
 
 // Al cargar: aplicar estado visual según si está verificado
@@ -2830,8 +2859,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     const saved = JSON.parse(localStorage.getItem('cf_insignia_destacada'));
     if (saved) {
-      const pjoin = document.getElementById('pjoin-insignia');
-      if (pjoin) pjoin.textContent = saved.emoji + ' ' + saved.nombre;
+      _setInsigniaEnPerfil(saved.emoji, saved.nombre);
       document.querySelectorAll('.insignia-item').forEach(i => {
         if (i.dataset.emoji === saved.emoji) i.classList.add('selected');
         else i.classList.remove('selected');
@@ -2842,8 +2870,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (celiaco) {
         document.querySelectorAll('.insignia-item').forEach(i => i.classList.remove('selected'));
         celiaco.classList.add('selected');
-        const pjoin = document.getElementById('pjoin-insignia');
-        if (pjoin) pjoin.textContent = '🌾 Miembro Celiaco';
+        _setInsigniaEnPerfil('💪', 'Miembro Celiaco');
       }
     }
   } catch(e) {}
