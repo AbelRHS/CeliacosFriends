@@ -4228,7 +4228,7 @@ function guardarQuedada() {
         personas: personas ? personas + ' confirmados' : '',
         tipo: tipoTexto
       };
-      const { data: inserted, error } = await _supabase.from('quedadas').insert(payload).select('id').single();
+      const { data: inserted, error } = await _supabase.from('mis_quedadas').insert(payload).select('id').single();
       if (error) { console.error('Error guardando quedada:', error.message); return; }
       // Guardar el id de Supabase en el elemento DOM para ediciones/borrado futuro
       item.dataset.sbid = inserted.id;
@@ -4253,7 +4253,7 @@ function eliminarQuedada(btn) {
       try {
         const { data: { user } } = await _supabase.auth.getUser();
         if (user) {
-          const { error } = await _supabase.from('quedadas').delete().eq('id', sbid).eq('user_id', user.id);
+          const { error } = await _supabase.from('mis_quedadas').delete().eq('id', sbid).eq('user_id', user.id);
           if (error) console.error('Error borrando quedada:', error.message);
           else console.log('✅ Quedada eliminada de Supabase:', sbid);
         }
@@ -10048,7 +10048,7 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
     if (!user) return;
 
     const { data, error } = await _supabase
-      .from('quedadas')
+      .from('mis_quedadas')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
