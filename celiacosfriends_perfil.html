@@ -2808,12 +2808,7 @@ const _INSIGNIA_IMG = {
 function _setInsigniaEnPerfil(emoji, nombre) {
   const pjoin = document.getElementById('pjoin-insignia');
   if (!pjoin) return;
-  const src = _INSIGNIA_IMG[emoji];
-  if (src) {
-    pjoin.innerHTML = '<img src="' + src + '" alt="' + nombre + '" style="width:1.1em;height:1.1em;object-fit:contain;vertical-align:middle;margin-right:4px;">' + nombre;
-  } else {
-    pjoin.textContent = emoji + ' ' + nombre;
-  }
+  pjoin.textContent = emoji + ' ' + nombre;
 }
 
 function seleccionarInsignia(el) {
