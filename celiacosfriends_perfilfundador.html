@@ -703,7 +703,7 @@
       <!-- Demo toggle: simula ver perfil propio vs ajeno -->
       <button id="demo-toggle-lbl" onclick="event.stopPropagation();toggleModoPerfilDemo()" style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,0.18);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.35);color:white;border-radius:50px;padding:5px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.78rem;cursor:pointer;z-index:10;transition:background 0.2s;pointer-events:auto;">👤 Mi perfil</button>
       <div class="profile-avatar-wrap" onclick="event.stopPropagation()">
-        <div class="profile-avatar" id="profile-avatar" onclick="event.stopPropagation();abrirMenuAvatar()" style="cursor:pointer;background:url('fotofundador.png') center/cover no-repeat;background-size:cover;"></div>
+        <div class="profile-avatar" id="profile-avatar" onclick="event.stopPropagation();abrirMenuAvatar()" style="cursor:pointer;background:url('fotofundador.jpg') center/cover no-repeat;background-size:cover;"></div>
         <div class="avatar-edit-icon">📷</div>
         <div class="avatar-online" id="avatar-dot" onclick="event.stopPropagation();toggleOnlineStatus()" style="cursor:pointer;width:22px;height:22px;border:3px solid white;transition:background 0.3s;z-index:10;"></div>
         <input type="file" id="avatar-input" accept="image/*" style="display:none;" onchange="loadAvatar(event)">
@@ -735,7 +735,7 @@
               <div class="pmeta-row" id="ploc-txt"><span id="ploc-ubicacion">📍 Madrid, España</span></div>
               <div class="pmeta-row"><span id="ploc-online-status">🟢 Online ahora</span></div>
               <div class="pmeta-row">🗓️ Miembro desde <span id="pjoin-year">2026</span></div>
-              <div class="pmeta-row"><span id="pjoin-insignia" style="cursor:pointer;" onclick="abrirSelectorInsignia()" title="Haz clic para cambiar tu insignia destacada">💪 Miembro Celiaco</span></div>
+              <div class="pmeta-row"><span id="pjoin-insignia" style="cursor:pointer;" onclick="abrirSelectorInsignia()" title="Haz clic para cambiar tu insignia destacada">👑 Miembro Fundador</span></div>
             </div>
           </div>
         </div>
@@ -1130,12 +1130,12 @@
         <div class="panel-card">
           <div class="panel-title">🏅 Mis insignias <span style="font-size:0.72rem;color:var(--text-light);font-weight:600;margin-left:4px;">· toca una para destacarla</span></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="insignias-grid">
-            <div class="insignia-item" data-emoji="👑" data-nombre="Miembro Fundador" data-restringida="fundador" onclick="abrirModalFundador(this)" title="Miembro Fundador: insignia exclusiva — haz clic para verificar">
+            <div class="insignia-item selected" data-emoji="👑" data-nombre="Miembro Fundador" data-restringida="fundador" onclick="abrirModalFundador(this)" title="Miembro Fundador: insignia exclusiva — haz clic para verificar">
               <img src="INSIGNIAS/1mf.png" style="width:48px;height:48px;object-fit:contain;margin-bottom:4px;">
               <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Miembro Fundador</div>
               <div id="fundador-lock-icon" style="font-size:0.65rem;color:#cc6600;font-weight:700;margin-top:2px;display:none;">🔒 Verificación</div>
             </div>
-            <div class="insignia-item selected" data-emoji="💪" data-nombre="Miembro Celiaco" onclick="seleccionarInsignia(this)" title="Miembro Celiaco: insignia por defecto al registrarse">
+            <div class="insignia-item" data-emoji="💪" data-nombre="Miembro Celiaco" onclick="seleccionarInsignia(this)" title="Miembro Celiaco: insignia por defecto al registrarse">
               <img src="INSIGNIAS/2mc.png" style="width:48px;height:48px;object-fit:contain;margin-bottom:4px;">
               <div style="font-size:0.72rem;font-weight:800;color:var(--teal-dark)">Miembro Celiaco</div>
             </div>
@@ -3098,28 +3098,16 @@ function abrirSelectorInsignia() {
   toast('🏅 Elige tu insignia destacada en el panel lateral');
 }
 
-// Restaurar insignia guardada al cargar
+// Insignia del fundador: siempre Miembro Fundador, no depende de localStorage
 document.addEventListener('DOMContentLoaded', () => {
   try {
-    const saved = JSON.parse(localStorage.getItem('cf_insignia_destacada'));
-    if (saved) {
-      const pjoin = document.getElementById('pjoin-insignia');
-      if (pjoin) pjoin.textContent = saved.emoji + ' ' + saved.nombre;
-      document.querySelectorAll('.insignia-item').forEach(i => {
-        if (i.dataset.emoji === saved.emoji) i.classList.add('selected');
-        else i.classList.remove('selected');
-      });
-    } else {
-      // Por defecto (primera vez): seleccionar Miembro Celiaco
-      const celiaco = document.querySelector('.insignia-item[data-nombre="Miembro Celiaco"]');
-      if (celiaco) {
-        document.querySelectorAll('.insignia-item').forEach(i => i.classList.remove('selected'));
-        celiaco.classList.add('selected');
-        const pjoin = document.getElementById('pjoin-insignia');
-        if (pjoin) pjoin.textContent = '💪 Miembro Celiaco';
-        try { localStorage.setItem('cf_insignia_destacada', JSON.stringify({ emoji: '💪', nombre: 'Miembro Celiaco' })); } catch(e) {}
-      }
+    const fundador = document.querySelector('.insignia-item[data-nombre="Miembro Fundador"]');
+    if (fundador) {
+      document.querySelectorAll('.insignia-item').forEach(i => i.classList.remove('selected'));
+      fundador.classList.add('selected');
     }
+    const pjoin = document.getElementById('pjoin-insignia');
+    if (pjoin) pjoin.textContent = '👑 Miembro Fundador';
   } catch(e) {}
 });
 
@@ -9199,7 +9187,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (typeof _sincOnlineIcon === 'function') _sincOnlineIcon();
   // Foto del fundador: siempre fija, nunca sobreescribir desde localStorage
   try {
-    const FOTO_FUNDADOR = 'fotofundador.png';
+    const FOTO_FUNDADOR = 'fotofundador.jpg';
     window._perfilFotoUrl = FOTO_FUNDADOR;
     const avatar = document.getElementById('profile-avatar');
     if (avatar) { avatar.textContent = ''; avatar.style.background = `url(${FOTO_FUNDADOR}) center/cover`; }
@@ -10205,17 +10193,8 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
     // Avatar desde Storage — ignorado en perfil fundador (foto siempre fija)
     // if (data.avatar_url) { ... }
 
-    // Insignia destacada
-    if (data.insignia_emoji && data.insignia_nombre) {
-      const pjoin = document.getElementById('pjoin-insignia');
-      if (pjoin) pjoin.textContent = data.insignia_emoji + ' ' + data.insignia_nombre;
-      document.querySelectorAll('.insignia-item').forEach(i => {
-        if (i.dataset.emoji === data.insignia_emoji) i.classList.add('selected');
-        else i.classList.remove('selected');
-      });
-      try { localStorage.setItem('cf_insignia_destacada', JSON.stringify({ emoji: data.insignia_emoji, nombre: data.insignia_nombre })); } catch(e) {}
-      console.log('✅ Insignia restaurada desde Supabase:', data.insignia_emoji, data.insignia_nombre);
-    }
+    // Insignia destacada — ignorada en perfil fundador (siempre Miembro Fundador)
+    // if (data.insignia_emoji && data.insignia_nombre) { ... }
 
     console.log('✅ Perfil "Sobre mí" cargado desde la nube');
   }
