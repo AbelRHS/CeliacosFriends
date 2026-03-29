@@ -2995,6 +2995,18 @@ function verificarFundador() {
       localStorage.setItem('cf_es_mi_perfil', 'true');
       _aplicarModoPerfil();
       toast('✅ ¡Bienvenido! Modo edición activado 🥇');
+      // Cerrar overlays como haría irAlPerfil
+      const comunidad = document.getElementById('comunidad-overlay');
+      if (comunidad) comunidad.classList.remove('open');
+      document.querySelectorAll('.modal-overlay.open, .modal-nr-overlay.open, .modal-qd-overlay.open').forEach(m => m.classList.remove('open'));
+      ['overlay-online','overlay-notif-modal','overlay-chat'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      document.body.style.overflow = '';
+      const cover = document.getElementById('profile-cover');
+      if (cover) cover.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      else window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       // Llamado desde el widget de insignias
       _aplicarEstadoFundador(true);
@@ -3438,11 +3450,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function irAlPerfil() {
-  // Si estamos viendo un perfil ajeno, volver a nuestro propio perfil
+  // Si estamos viendo un perfil ajeno, pedir contraseña antes de pasar a modo propio
   if (!_esMiPerfil) {
-    _esMiPerfil = true;
-    localStorage.setItem('cf_es_mi_perfil', 'true');
-    _aplicarModoPerfil();
+    _abrirModalAccesoFundador();
+    return;
   }
   // Cerrar comunidad si está abierta
   const comunidad = document.getElementById('comunidad-overlay');
