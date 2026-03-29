@@ -703,7 +703,7 @@
       <!-- Demo toggle: simula ver perfil propio vs ajeno -->
       <button id="demo-toggle-lbl" onclick="event.stopPropagation();toggleModoPerfilDemo()" style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,0.18);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.35);color:white;border-radius:50px;padding:5px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.78rem;cursor:pointer;z-index:10;transition:background 0.2s;pointer-events:auto;">👤 Mi perfil</button>
       <div class="profile-avatar-wrap" onclick="event.stopPropagation()">
-        <div class="profile-avatar" id="profile-avatar" onclick="event.stopPropagation();abrirMenuAvatar()" style="cursor:pointer;background:url('fotofundador.jpg') center/cover no-repeat;background-size:cover;"></div>
+        <div class="profile-avatar" id="profile-avatar" onclick="event.stopPropagation();abrirMenuAvatar()" style="cursor:pointer;background:url('fotofundador.png') center/cover no-repeat;background-size:cover;"></div>
         <div class="avatar-edit-icon">📷</div>
         <div class="avatar-online" id="avatar-dot" onclick="event.stopPropagation();toggleOnlineStatus()" style="cursor:pointer;width:22px;height:22px;border:3px solid white;transition:background 0.3s;z-index:10;"></div>
         <input type="file" id="avatar-input" accept="image/*" style="display:none;" onchange="loadAvatar(event)">
@@ -743,14 +743,9 @@
         <div id="actions-propio-perfil" style="display:flex;align-items:center;">
           <button class="paction primary" onclick="abrirChatConMiMismo()">💬 Mensaje</button>
         </div>
-        <!-- Acciones perfil ajeno: esquina derecha, misma altura que el nombre -->
-        <div class="profile-actions" id="actions-ajeno-perfil" style="display:none;align-items:center;">
-          <button class="paction primary" id="btn-amigo-perfil" onclick="toggleAmistad()">👤 Añadir amigo</button>
-          <button class="paction primary" onclick="abrirChatConPerfil()">💬 Mensaje</button>
-          <div style="position:relative;display:inline-block;">
-            <button class="paction danger" id="btn-bloquear-perfil" onclick="confirmarBloqueo()" onmouseover="document.getElementById('tt-bloquear2').style.opacity='1'" onmouseout="document.getElementById('tt-bloquear2').style.opacity='0'">🚫</button>
-            <div id="tt-bloquear2" style="position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);background:#1a3a3a;color:white;border-radius:8px;font-size:0.75rem;font-weight:700;padding:4px 10px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.2s;z-index:100;">Bloquear</div>
-          </div>
+        <!-- Acciones perfil fundador: botón Volver a mi perfil -->
+        <div class="profile-actions" id="actions-ajeno-perfil" style="display:flex;align-items:center;">
+          <button class="paction primary" onclick="window.location.href='celiacosfriends_perfil.html'">← Volver a mi perfil</button>
         </div>
       </div>
 
@@ -6710,13 +6705,13 @@ async function eliminarExperienciaDesdeModal() {
 // ── CAMBIO DE NICK ────────────────────────────────────────────────────
 const NICK_KEY      = 'cf_nick';
 const NICK_TS_KEY   = 'cf_nick_ts';
-// Nick por defecto del fundador (solo si no hay uno guardado)
-if (!localStorage.getItem(NICK_KEY)) localStorage.setItem(NICK_KEY, 'A83Fundador');
+// Nick fijo del fundador: este perfil siempre muestra 'A83Fundador'
+const NICK_FUNDADOR = 'A83Fundador';
 const NICK_COOLDOWN = 7 * 24 * 60 * 60 * 1000; // 1 semana en ms
 
 function getNickActual() {
-  const cfUser = JSON.parse(localStorage.getItem('cf_user') || '{}');
-  return localStorage.getItem(NICK_KEY) || cfUser.nombre || 'Usuario';
+  // Este es el perfil del fundador: el nick mostrado siempre es el del fundador
+  return NICK_FUNDADOR;
 }
 
 function getNickTs() {
@@ -6854,13 +6849,12 @@ function guardarNick() {
   sincronizarNickEnPerfiles(nuevoNick);
 }
 
-// Al cargar la página: aplicar nick guardado si existe
+// Al cargar la página: este es el perfil del fundador, siempre mostrar su nick
 (function initNick() {
-  const saved = localStorage.getItem(NICK_KEY);
-  if (saved) sincronizarNickEnPagina(saved);
-  // Mostrar estado del botón en ajustes (ya tendrá el nick correcto)
+  sincronizarNickEnPagina(NICK_FUNDADOR);
+  // Mostrar estado del botón en ajustes
   const lbl = document.getElementById('nick-actual-label');
-  if (lbl) lbl.textContent = getNickActual();
+  if (lbl) lbl.textContent = NICK_FUNDADOR;
 })();
 
 </script>
@@ -9203,15 +9197,12 @@ document.addEventListener('keydown', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
   // Sincronizar icono Celiacos Online con estado guardado
   if (typeof _sincOnlineIcon === 'function') _sincOnlineIcon();
-  // Restaurar foto de perfil guardada
+  // Foto del fundador: siempre fija, nunca sobreescribir desde localStorage
   try {
-    const savedAvatar = localStorage.getItem('cf_avatar_url');
-    if (savedAvatar) {
-      window._perfilFotoUrl = savedAvatar;
-      sincronizarTodosLosAvatares(savedAvatar);
-      const avatar = document.getElementById('profile-avatar');
-      if (avatar) { avatar.textContent = ''; avatar.style.background = `url(${savedAvatar}) center/cover`; }
-    }
+    const FOTO_FUNDADOR = 'fotofundador.png';
+    window._perfilFotoUrl = FOTO_FUNDADOR;
+    const avatar = document.getElementById('profile-avatar');
+    if (avatar) { avatar.textContent = ''; avatar.style.background = `url(${FOTO_FUNDADOR}) center/cover`; }
   } catch(e) {}
   // El amigo ARH tiene nombre fijo
   try {
@@ -10211,18 +10202,8 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
       if (wrap) wrap.innerHTML = data.preferencias.map(p => '<span class="tag green">' + p + '</span>').join('');
     }
 
-    // Avatar desde Storage
-    if (data.avatar_url) {
-      const imgUrl = data.avatar_url + '?t=' + Date.now(); // anti-caché
-      const avatar = document.getElementById('profile-avatar');
-      if (avatar) { avatar.textContent = ''; avatar.style.background = `url(${imgUrl}) center/cover`; }
-      window._perfilFotoUrl = imgUrl;
-      try { localStorage.setItem('cf_avatar_url', imgUrl); } catch(e) {}
-      if (typeof sincronizarTodosLosAvatares === 'function') sincronizarTodosLosAvatares(imgUrl);
-      // Mostrar botón "Quitar foto"
-      const btnQuitar = document.getElementById('avatar-menu-quitar');
-      if (btnQuitar) btnQuitar.style.display = 'block';
-    }
+    // Avatar desde Storage — ignorado en perfil fundador (foto siempre fija)
+    // if (data.avatar_url) { ... }
 
     // Insignia destacada
     if (data.insignia_emoji && data.insignia_nombre) {
