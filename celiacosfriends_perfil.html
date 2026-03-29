@@ -9744,7 +9744,42 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
 
     if (error || !data) {
       console.log('Sin perfil guardado aún en la nube');
+      // Fallback: intentar leer nick de user_metadata si no hay fila en perfiles
+      const meta = user.user_metadata || {};
+      const nickMeta = meta.nick || meta.nombre;
+      if (nickMeta) {
+        try { localStorage.setItem('cf_nick', nickMeta); } catch(e) {}
+        if (typeof sincronizarNickEnPagina === 'function') sincronizarNickEnPagina(nickMeta);
+        else {
+          const pname = document.querySelector('.pname');
+          if (pname) pname.textContent = nickMeta;
+        }
+      }
       return;
+    }
+
+    // ── Nick ──────────────────────────────────────────────────────────────────
+    if (data.nick) {
+      // Guardar en localStorage para que getNickActual() lo devuelva
+      try { localStorage.setItem('cf_nick', data.nick); } catch(e) {}
+      // Propagar a todos los elementos del DOM
+      if (typeof sincronizarNickEnPagina === 'function') {
+        sincronizarNickEnPagina(data.nick);
+      } else {
+        const pname = document.querySelector('.pname');
+        if (pname) pname.textContent = data.nick;
+      }
+      console.log('✅ Nick cargado desde la nube:', data.nick);
+    } else if (data.nombre) {
+      // Algunos perfiles guardan "nombre" en vez de "nick"
+      try { localStorage.setItem('cf_nick', data.nombre); } catch(e) {}
+      if (typeof sincronizarNickEnPagina === 'function') sincronizarNickEnPagina(data.nombre);
+    }
+
+    // ── Edad (campo entero directo, guardado desde index.html) ───────────────
+    if (data.edad && !data.fecha_nacimiento) {
+      const el = document.getElementById('edad-val-display');
+      if (el) el.childNodes[0].textContent = '🎂 ' + data.edad + ' años ';
     }
 
     // Bio
