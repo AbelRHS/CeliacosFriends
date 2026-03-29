@@ -733,7 +733,8 @@
         <div style="display:flex;align-items:flex-start;gap:16px;">
           <div style="width:100px;flex-shrink:0;" class="avatar-spacer"></div><!-- hueco para la foto que sobresale -->
           <div class="profile-info">
-            <div class="pname">Usuario</div>
+            <div class="pname">@usuario</div>
+            <div id="preal-nombre" style="font-size:0.85rem;font-weight:600;color:var(--text-light);margin-top:2px;margin-bottom:2px;"></div>
             <div class="pmeta-list">
               <div class="pmeta-row" id="ploc-txt"><span id="ploc-ubicacion">📍 Madrid, España</span></div>
               <div class="pmeta-row"><span id="ploc-online-status">🟢 Online ahora</span></div>
@@ -6248,9 +6249,9 @@ function formatearCooldown(ms) {
 }
 
 function sincronizarNickEnPagina(nuevoNick) {
-  // Nombre principal del perfil
+  // Nombre principal del perfil — mostrar como @nick
   const pname = document.querySelector('.pname');
-  if (pname) pname.textContent = nuevoNick;
+  if (pname) pname.textContent = '@' + nuevoNick;
 
   // Sidebar (solo primer nombre)
   const sidebarInfo = document.querySelector('.sidebar-user-info div');
@@ -9372,12 +9373,18 @@ function renderComTop10Rest() {
   // Sincronizar nick y avatar al cargar — se ejecuta tras DOMContentLoaded para que getNickActual esté disponible
   document.addEventListener('DOMContentLoaded', function _sincNickAlCargar() {
     // Usar getNickActual() que respeta cf_nick > cf_user.nombre
-    const nombre  = (typeof getNickActual === 'function') ? getNickActual() : (localStorage.getItem('cf_nick') || (JSON.parse(localStorage.getItem('cf_user') || '{}').nombre) || 'Usuario');
+    const nombre  = (typeof getNickActual === 'function') ? getNickActual() : (localStorage.getItem('cf_nick') || (JSON.parse(localStorage.getItem('cf_user') || '{}').nombre) || 'usuario');
     const inicial = nombre.charAt(0).toUpperCase();
 
-    // Nombre principal del perfil
+    // Nombre principal del perfil — mostrar @nick
     const nombreEl = document.querySelector('.pname');
-    if (nombreEl) nombreEl.textContent = nombre;
+    if (nombreEl) nombreEl.textContent = '@' + nombre;
+
+    // Nombre real debajo del nick (de cf_user.nombre si existe y es distinto del nick)
+    const cfUser = JSON.parse(localStorage.getItem('cf_user') || '{}');
+    const nombreReal = cfUser.nombre;
+    const realEl = document.getElementById('preal-nombre');
+    if (realEl && nombreReal && nombreReal !== nombre) realEl.textContent = nombreReal;
 
     // Sidebar inicial y nombre
     const sidebarAv = document.querySelector('.user-av');
@@ -9767,7 +9774,12 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
         sincronizarNickEnPagina(data.nick);
       } else {
         const pname = document.querySelector('.pname');
-        if (pname) pname.textContent = data.nick;
+        if (pname) pname.textContent = '@' + data.nick;
+      }
+      // Mostrar nombre real debajo del nick si es diferente
+      if (data.nombre && data.nombre !== data.nick) {
+        const realEl = document.getElementById('preal-nombre');
+        if (realEl) realEl.textContent = data.nombre;
       }
       console.log('✅ Nick cargado desde la nube:', data.nick);
     } else if (data.nombre) {
