@@ -779,7 +779,7 @@
             <div class="info-bio">¡Hola! Soy Abel, celiaco desde los 19 años. Me apasiona la cocina sin gluten y descubrir restaurantes seguros por España y el mundo. Me encanta conectar con personas que entienden lo que es vivir con celiaquía y compartir trucos, recetas y experiencias.</div>
             <div class="info-grid">
               <div class="info-item"><div class="info-label">Ciudad</div><div class="info-val">📍 Madrid, España <span class='pluma-inline' onmouseover="this.style.filter='drop-shadow(0 0 4px #f5c518) drop-shadow(0 0 8px #f5c518)'" onmouseout="this.style.filter='none'" onclick='editarVal(this)'>✏️</span></div></div>
-              <div class="info-item"><div class="info-label">Edad</div><div class="info-val" id="edad-val-display">🎂 43 años <span class='pluma-inline' onmouseover="this.style.filter='drop-shadow(0 0 4px #f5c518) drop-shadow(0 0 8px #f5c518)'" onmouseout="this.style.filter='none'" onclick='abrirSelectorFechaNacimiento(this)'>✏️</span></div></div>
+              <div class="info-item"><div class="info-label">Edad</div><div class="info-val" id="edad-val-display">🎂 43 años (1 Enero 1981) <span class='pluma-inline' onmouseover="this.style.filter='drop-shadow(0 0 4px #f5c518) drop-shadow(0 0 8px #f5c518)'" onmouseout="this.style.filter='none'" onclick='abrirSelectorFechaNacimiento(this)'>✏️</span></div></div>
               <div class="info-item"><div class="info-label">Diagnóstico</div><div class="info-val">🏥 Celiaco desde 2003 <span class='pluma-inline' onmouseover="this.style.filter='drop-shadow(0 0 4px #f5c518) drop-shadow(0 0 8px #f5c518)'" onmouseout="this.style.filter='none'" onclick='editarVal(this)'>✏️</span></div></div>
               <div class="info-item"><div class="info-label">Dieta</div><div class="info-val">🌿 Sin gluten estricto <span class='pluma-inline' onmouseover="this.style.filter='drop-shadow(0 0 4px #f5c518) drop-shadow(0 0 8px #f5c518)'" onmouseout="this.style.filter='none'" onclick='editarVal(this)'>✏️</span></div></div>
             </div>
@@ -788,14 +788,14 @@
           <div class="info-card">
             <h3 class='h3-editable' style="display:flex;align-items:center;gap:8px;cursor:default;">❤️ Mis intereses <span class='pluma-h3' onmouseover="this.style.filter='drop-shadow(0 0 4px #f5c518) drop-shadow(0 0 8px #f5c518)'" onmouseout="this.style.filter='none'" onclick='abrirEditorIntereses()'>✏️</span></h3>
             <div class="tags-wrap" id="tags-intereses">
-              <span style="color:#5a7a7a;font-size:0.88rem;">Sin intereses añadidos. ¡Pulsa el ✏️ para añadir!</span>
+              <span class="tag">🎵 Música</span><span class="tag">📸 Fotografía</span><span class="tag">🏃 Deporte</span><span class="tag">🎨 Arte</span>
             </div>
           </div>
 
           <div class="info-card">
             <h3 class='h3-editable' style="display:flex;align-items:center;gap:8px;cursor:default;">🍽️ Mis preferencias de comida <span class='pluma-h3' onmouseover="this.style.filter='drop-shadow(0 0 4px #f5c518) drop-shadow(0 0 8px #f5c518)'" onmouseout="this.style.filter='none'" onclick='abrirEditorPreferencias()'>✏️</span></h3>
             <div class="tags-wrap" id="tags-preferencias">
-              <span style="color:#5a7a7a;font-size:0.88rem;">Sin preferencias añadidas. ¡Pulsa el ✏️ para añadir!</span>
+              <span class="tag green">🍕 Pizza SG</span><span class="tag green">🫒 Mediterránea</span><span class="tag green">🍝 Pasta</span>
             </div>
           </div>
         </div>
@@ -3494,6 +3494,8 @@ function _sincronizarAvatoresModales() {
 // Por defecto arranca en modo PERFIL AJENO (solo lectura)
 let _esMiPerfil = false;
 localStorage.setItem('cf_es_mi_perfil', 'false');
+// Fecha de nacimiento por defecto si no está guardada
+try { if (!localStorage.getItem('cf_fnac')) localStorage.setItem('cf_fnac', JSON.stringify({a:1981, m:1, d:1})); } catch(e) {}
 
 function _aplicarModoPerfil() {
   const actionsAjeno = document.getElementById('actions-ajeno-perfil');
@@ -9830,14 +9832,17 @@ function renderComTop10Rest() {
       if (label === 'Diagnóstico') el.firstChild.textContent = '🏥 Celiaco desde 2003 ';
       if (label === 'Dieta') el.firstChild.textContent = '🌿 Sin gluten estricto ';
     });
+    // Edad por defecto
+    const edadEl = document.getElementById('edad-val-display');
+    if (edadEl) edadEl.childNodes[0].textContent = '🎂 43 años (1 Enero 1981) ';
 
-    // Intereses vacíos
+    // Intereses por defecto
     const tagsIntereses = document.getElementById('tags-intereses');
-    if (tagsIntereses) tagsIntereses.innerHTML = '<span style="color:#5a7a7a;font-size:0.88rem;">Sin intereses añadidos. ¡Pulsa el ✏️ para añadir!</span>';
+    if (tagsIntereses) tagsIntereses.innerHTML = '<span class="tag">🎵 Música</span><span class="tag">📸 Fotografía</span><span class="tag">🏃 Deporte</span><span class="tag">🎨 Arte</span>';
 
-    // Preferencias de comida vacías
+    // Preferencias de comida por defecto
     const tagsPref = document.getElementById('tags-preferencias');
-    if (tagsPref) tagsPref.innerHTML = '<span style="color:#5a7a7a;font-size:0.88rem;">Sin preferencias añadidas. ¡Pulsa el ✏️ para añadir!</span>';
+    if (tagsPref) tagsPref.innerHTML = '<span class="tag green">🍕 Pizza SG</span><span class="tag green">🫒 Mediterránea</span><span class="tag green">🍝 Pasta</span>';
 
     // Recetas vacías
     const recetasGrid = document.getElementById('mini-recetas-grid');
