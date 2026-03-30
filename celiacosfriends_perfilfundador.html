@@ -857,7 +857,7 @@
             </h3>
             <div class="amigos-grid" id="amigos-grid">
               <div class="amigo-card" id="amigo-card-admin" onclick="_verPerfilAdmin()">
-                <div class="amigo-av perfil-av-sync" id="amigo-admin-av" style="background:linear-gradient(135deg,var(--teal),var(--green))">A</div>
+                <div class="amigo-av perfil-av-sync" id="amigo-admin-av" style="background:url('fotofundador.jpg') center/cover no-repeat;"></div>
                 <div class="amigo-name" id="amigo-admin-nombre">ARH</div>
                 <div class="amigo-dist" style="color:var(--teal-dark);font-weight:700;">⭐ Admin · Madrid</div>
               </div>
@@ -2418,7 +2418,9 @@ function mostrarSelectorDiagnostico(valDiv, pluma) {
     item.onmouseover = () => item.style.background = '#f0f8f8';
     item.onmouseout = () => item.style.background = 'white';
     item.onclick = () => {
-      valDiv.childNodes[0].textContent = '🏥 Celiaco desde ' + anio + ' ';
+      const textNode = Array.from(valDiv.childNodes).find(n => n.nodeType === Node.TEXT_NODE);
+      if (textNode) textNode.textContent = '🏥 Celiaco desde ' + anio + ' ';
+      else valDiv.firstChild && (valDiv.firstChild.textContent = '🏥 Celiaco desde ' + anio + ' ');
       dropdown.remove();
       toast('🏥 Diagnóstico actualizado a ' + anio);
       guardarPerfilEnSupabase({ diagnostico: 'Celiaco desde ' + anio });
@@ -2587,7 +2589,10 @@ function mostrarSelectorCiudad(valDiv, pluma) {
     item.onmouseover = () => item.style.background = '#f0f8f8';
     item.onmouseout = () => item.style.background = 'white';
     item.onclick = () => {
-      valDiv.childNodes[0].textContent = '📍 ' + prov + ', España ';
+      // Buscar el nodo de texto (no el span de la pluma)
+      const textNode = Array.from(valDiv.childNodes).find(n => n.nodeType === Node.TEXT_NODE);
+      if (textNode) textNode.textContent = '📍 ' + prov + ', España ';
+      else valDiv.firstChild && (valDiv.firstChild.textContent = '📍 ' + prov + ', España ');
       // Actualizar solo el span de ubicación, respetando visibilidad y estado online actual
       const _spanUbic = document.getElementById('ploc-ubicacion');
       if (_spanUbic) _spanUbic.textContent = '📍 ' + prov + ', España';
@@ -2806,10 +2811,10 @@ function _comprimirImagen(file, maxPx, calidad) {
 }
 
 function sincronizarTodosLosAvatares(imgUrl) {
-  const url = imgUrl || window._perfilFotoUrl;
+  const url = imgUrl || window._perfilFotoUrl || 'fotofundador.jpg';
   const nombre = (typeof getNickActual === 'function') ? getNickActual() : (localStorage.getItem('cf_nick') || 'U');
   const inicial = nombre.charAt(0).toUpperCase();
-  const eliminar = !url; // true = quitar foto, volver a inicial
+  const eliminar = false; // En el perfil fundador la foto es siempre fotofundador.jpg
 
   // Sidebar
   const sidebarAv = document.querySelector('.sidebar-user .user-av');
@@ -9870,7 +9875,7 @@ function renderComTop10Rest() {
     const amigosGrid = document.getElementById('amigos-grid');
     if (amigosGrid) amigosGrid.innerHTML = `
       <div class="amigo-card" id="amigo-card-admin" onclick="_verPerfilAdmin()">
-        <div class="amigo-av perfil-av-sync" id="amigo-admin-av" style="background:linear-gradient(135deg,var(--teal),var(--green))">A</div>
+        <div class="amigo-av perfil-av-sync" id="amigo-admin-av" style="background:url('fotofundador.jpg') center/cover no-repeat;"></div>
         <div class="amigo-name" id="amigo-admin-nombre">ARH</div>
         <div class="amigo-dist" style="color:var(--teal-dark);font-weight:700;">⭐ Admin · Madrid</div>
       </div>`;
