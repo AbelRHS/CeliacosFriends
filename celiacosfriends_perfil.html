@@ -10424,14 +10424,21 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
       if (avGrande) { avGrande.textContent = inicial; avGrande.style.background = 'linear-gradient(135deg,var(--teal),var(--green))'; }
     }
 
-    // Sidebar: siempre muestra al usuario logueado (Antonio), no al perfil visitado
+    // ── Sidebar: siempre muestra al usuario logueado (Antonio), no al perfil visitado ──
+    // Cargamos la foto de Antonio desde Supabase para asegurarnos de que está disponible
+    const { data: miPerfil } = await _supabase
+      .from('perfiles')
+      .select('avatar_url, foto_url, nick')
+      .eq('user_id', (await _supabase.auth.getUser()).data.user?.id)
+      .single();
+
     const avSidebar = document.querySelector('.sidebar-user .user-av');
     if (avSidebar) {
-      const miFoto = window._perfilFotoUrl || '';
-      const miNick = localStorage.getItem('cf_nick') || '';
+      const miFoto = miPerfil?.avatar_url || miPerfil?.foto_url || window._perfilFotoUrl || '';
+      const miNick = miPerfil?.nick || localStorage.getItem('cf_nick') || '';
       if (miFoto) {
         avSidebar.textContent = '';
-        avSidebar.style.background = `url(${miFoto}) center/cover`;
+        avSidebar.style.background = `url(${miFoto}?t=${Date.now()}) center/cover`;
         avSidebar.style.backgroundSize = 'cover';
       } else {
         avSidebar.textContent = miNick.charAt(0).toUpperCase() || 'A';
@@ -10493,10 +10500,186 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
 
     // Botón "Ir a mi perfil" en la barra muestra el nick del usuario logueado (Antonio)
     const sidebarInfo = document.querySelector('.sidebar-user-info div');
-    if (sidebarInfo) sidebarInfo.textContent = (localStorage.getItem('cf_nick') || 'Mi perfil').split(' ')[0];
+    if (sidebarInfo) sidebarInfo.textContent = (miPerfil?.nick || localStorage.getItem('cf_nick') || 'Mi perfil').split(' ')[0];
 
     toast('👤 Viendo perfil de @' + nickMostrar);
     console.log('✅ Perfil ajeno cargado:', nickMostrar);
+
+    // ── Cargar el CONTENIDO del perfil ajeno (recetas, quedadas, viajes) ──────
+    // Necesitamos el user_id de Sara (la persona visitada), no el de Antonio
+    const userIdAjeno = data.user_id;
+    if (userIdAjeno) {
+      await _cargarContenidoAjeno(userIdAjeno, nickMostrar);
+    }
+  }
+
+  // ─── CARGAR RECETAS / QUEDADAS / VIAJES DE OTRO USUARIO ────────────────────
+  async function _cargarContenidoAjeno(userIdAjeno, nickAjeno) {
+    const inicialAjena = nickAjeno.charAt(0).toUpperCase();
+
+    // ── Recetas ──────────────────────────────────────────────────────────────
+    const { data: recetas } = await _supabase
+      .from('mis_recetas')
+      .select('*')
+      .eq('user_id', userIdAjeno)
+      .order('created_at', { ascending: false });
+
+    const grid = document.getElementById('mini-recetas-grid');
+    if (grid && recetas && recetas.length > 0) {
+      const placeholder = grid.querySelector('p');
+      if (placeholder) placeholder.remove();
+      recetas.forEach(r => {
+        if (document.querySelector(`.mini-receta[data-sbid="${r.id}"]`)) return;
+        const fotoUrl = r.foto_url ? r.foto_url + '?t=' + Date.now() : '';
+        const card = document.createElement('div');
+        card.className = 'mini-receta';
+        card.dataset.titulo = r.titulo;
+        card.dataset.texto  = r.texto  || '';
+        card.dataset.emoji  = r.emoji  || '🍽️';
+        card.dataset.color  = r.color  || 'linear-gradient(135deg,#e8f5e9,#a5d6a7)';
+        card.dataset.foto   = fotoUrl;
+        card.dataset.likes  = '0';
+        card.dataset.sbid   = r.id;
+        card.innerHTML = `
+          <div class="mini-receta-img" style="background:${r.color||'linear-gradient(135deg,#e8f5e9,#a5d6a7)'};position:relative;overflow:hidden;" onclick="verReceta(this.closest('.mini-receta'))">
+            ${fotoUrl ? `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">` : (r.emoji||'🍽️')}
+          </div>
+          <div class="mini-receta-info">
+            <div class="mini-receta-name" onclick="verReceta(this.closest('.mini-receta'))" style="cursor:pointer">${r.titulo}</div>
+            <div style="font-size:0.72rem;color:var(--text-light);margin-top:3px;">${r.cat||'🍽️ Todas'} · ⏱️ ${r.tiempo||'?'} min · ${r.dif||'Fácil'}</div>
+            <div class="mini-receta-footer">
+              <button class="like-btn" onclick="toggleLike(this)" title="Me gusta"><span class="like-heart">🤍</span><span class="like-count">0</span></button>
+            </div>
+            <div class="mini-receta-autor">
+              <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:white;flex-shrink:0;">${inicialAjena}</div>
+              <div>
+                <div style="font-size:0.6rem;color:var(--text-light);line-height:1.3;">Publicado por</div>
+                <div style="font-size:0.72rem;font-weight:800;color:var(--text);">@${nickAjeno}</div>
+              </div>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+      actualizarStatRecetas();
+      console.log('✅ Recetas ajenas cargadas:', recetas.length);
+    }
+
+    // ── Quedadas ─────────────────────────────────────────────────────────────
+    const { data: quedadas } = await _supabase
+      .from('mis_quedadas')
+      .select('*')
+      .eq('user_id', userIdAjeno)
+      .order('created_at', { ascending: false });
+
+    const listaQ = document.getElementById('quedadas-lista');
+    if (listaQ && quedadas && quedadas.length > 0) {
+      const placeholder = listaQ.querySelector('p');
+      if (placeholder) placeholder.remove();
+      const estadoMap = {
+        '⏳ Próxima':   { texto: '⏳ Próxima',   color: 'var(--gold)',      bg: 'rgba(232,168,48,0.12)' },
+        '✅ Asistí':    { texto: '✅ Asistí',    color: 'var(--teal-dark)', bg: 'rgba(58,154,154,0.1)' },
+        '❌ No asistí': { texto: '❌ No asistí', color: '#cc4444',          bg: 'rgba(204,68,68,0.08)' }
+      };
+      quedadas.forEach(q => {
+        if (document.querySelector(`.quedada-item[data-sbid="${q.id}"]`)) return;
+        const estado = estadoMap[q.estado] || estadoMap['⏳ Próxima'];
+        const newId = 'sb_' + q.id;
+        let _sub = '';
+        if (q.fecha && q.fecha !== '—') _sub += '📅 ' + q.fecha;
+        if (q.lugar && q.lugar !== '—') _sub += (_sub ? ' · ' : '') + '📍 ' + q.lugar;
+        const item = document.createElement('div');
+        item.className = 'quedada-item';
+        item.dataset.id = newId;
+        item.dataset.sbid = q.id;
+        item.dataset.titulo = q.titulo;
+        item.style.cssText = 'background:var(--bg);border-radius:16px;padding:14px;cursor:pointer;transition:box-shadow 0.2s;';
+        item.onmouseover = () => item.style.boxShadow = '0 4px 16px rgba(58,154,154,0.13)';
+        item.onmouseout  = () => item.style.boxShadow = 'none';
+        item.innerHTML = `
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <div style="font-size:1.8rem;flex-shrink:0;margin-top:2px;">${q.emoji || '📅'}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;">
+                <div style="font-weight:800;font-size:0.93rem;line-height:1.2;">${q.titulo}</div>
+                <span style="font-size:0.72rem;font-weight:700;color:${estado.color};background:${estado.bg};padding:3px 9px;border-radius:50px;white-space:nowrap;">${estado.texto}</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--text-light);">${_sub || 'Sin detalles'}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #e8f4f4;">
+            <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:white;flex-shrink:0;">${inicialAjena}</div>
+            <div>
+              <div style="font-size:0.68rem;color:var(--text-light);">Publicado por</div>
+              <div style="font-size:0.72rem;font-weight:800;color:var(--text);">@${nickAjeno}</div>
+            </div>
+            <div style="margin-left:auto;">
+              <button class="like-btn" onclick="event.stopPropagation();toggleLike(this)" title="Me gusta"><span class="like-heart">🤍</span><span class="like-count">0</span></button>
+            </div>
+          </div>`;
+        listaQ.appendChild(item);
+      });
+      actualizarContadorQuedadas();
+      console.log('✅ Quedadas ajenas cargadas:', quedadas.length);
+    }
+
+    // ── Viajes ───────────────────────────────────────────────────────────────
+    const { data: viajes } = await _supabase
+      .from('mis_viajes')
+      .select('*')
+      .eq('user_id', userIdAjeno)
+      .order('created_at', { ascending: false });
+
+    const { data: experiencias } = await _supabase
+      .from('mis_experiencias')
+      .select('*')
+      .eq('user_id', userIdAjeno)
+      .order('created_at', { ascending: false });
+
+    const listaV = document.getElementById('viajes-lista');
+    if (listaV) {
+      const hayViajes = viajes && viajes.length > 0;
+      const hayExp    = experiencias && experiencias.length > 0;
+      if (hayViajes || hayExp) {
+        const placeholder = listaV.querySelector('p');
+        if (placeholder) placeholder.remove();
+      }
+      if (hayViajes) {
+        viajes.forEach(v => {
+          if (document.querySelector(`.viaje-item[data-sbid="${v.id}"]`)) return;
+          const detalles = [v.fecha, v.duracion, v.companeros ? '👥 ' + v.companeros : '', v.restaurantes ? '🍽️ ' + v.restaurantes + ' SG' : '']
+            .filter(Boolean).join(' · ');
+          const item = document.createElement('div');
+          item.className = 'viaje-item';
+          item.dataset.destino  = v.destino || '';
+          item.dataset.sbid     = v.id;
+          item.style.cssText = 'display:flex;flex-direction:column;gap:0;padding:12px;background:var(--bg);border-radius:14px;cursor:pointer;transition:box-shadow 0.2s;';
+          item.onmouseover = () => item.style.boxShadow = '0 4px 16px rgba(58,154,154,0.13)';
+          item.onmouseout  = () => item.style.boxShadow = 'none';
+          item.onclick = (e) => { if (!e.target.closest('button')) abrirDetalleViaje(item); };
+          item.innerHTML = `
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:1.8rem;flex-shrink:0;">${v.emoji || '🌍'}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:800;font-size:0.92rem;">${v.destino}</div>
+                <div style="font-size:0.75rem;color:var(--text-light);">${detalles || '—'}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e8f4f4;">
+              <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:900;color:white;flex-shrink:0;">${inicialAjena}</div>
+              <div>
+                <div style="font-size:0.6rem;color:var(--text-light);line-height:1.3;">Publicado por</div>
+                <div style="font-size:0.72rem;font-weight:800;color:var(--text);">@${nickAjeno}</div>
+              </div>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+                <button class="like-btn" onclick="event.stopPropagation();toggleLike(this)" title="Me gusta"><span class="like-heart">🤍</span><span class="like-count">0</span></button>
+                <span style="font-size:0.78rem;font-weight:800;color:var(--green-dark);background:rgba(90,170,106,0.12);padding:2px 8px;border-radius:50px;white-space:nowrap;">⭐ ${parseFloat(v.puntuacion||5).toFixed(1)}</span>
+              </div>
+            </div>`;
+          listaV.appendChild(item);
+        });
+        console.log('✅ Viajes ajenos cargados:', viajes.length);
+      }
+    }
   }
 
   // ─── CARGAR RECETAS DESDE SUPABASE ─────────────────────────────────────────
