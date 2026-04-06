@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abel Rubio - Canciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --text: #e0e0e0;
+    --text-muted: #888;
+    --active-bg: #1a1200;
+    --active-border: #c9a84c;
+    --playing-color: #c9a84c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 0 0 60px 0;
+  }
+
+
+  /* ── HISTORIA ── */
+  .historia-wrap {
+    max-width: 960px;
+    margin: 32px auto 0;
+    padding: 0 20px;
+  }
+  .historia-box {
+    padding: 28px 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    position: relative;
+  }
+  .historia-box::before {
+    content: '"';
+    font-family: 'Cinzel', serif;
+    font-size: 5rem;
+    color: var(--gold);
+    opacity: 0.15;
+    position: absolute;
+    top: -0.5rem;
+    left: 1rem;
+    line-height: 1;
+  }
+  .historia-box p {
+    font-family: 'Lato', serif;
+    font-style: italic;
+    font-size: 0.97rem;
+    line-height: 1.9;
+    color: #c8c4ba;
+    margin-bottom: 0.75rem;
+  }
+  .historia-box p:last-of-type { margin-bottom: 0; }
+  .historia-credits {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 2.2;
+  }
+  .historia-credits strong { color: var(--text); }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(180deg, #111 0%, #0d0d0d 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  header .logo-circle {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    color: #000;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  header p {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px 0;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ── CD CARD ── */
+  .cd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .cd-covers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cd-covers img {
+    width: 140px;
+    border-radius: 3px;
+    display: block;
+  }
+
+  .cd-covers .label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .cd-info { }
+
+  .cd-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .cd-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 4px;
+    font-style: italic;
+  }
+
+  .cd-artist {
+    font-size: 13px;
+    color: var(--gold);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .cd-tracklist {
+    list-style: none;
+  }
+
+  .cd-tracklist li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .cd-tracklist li:hover { background: var(--surface2); }
+
+  .cd-tracklist li.active {
+    background: var(--active-bg);
+    border-left: 2px solid var(--active-border);
+  }
+
+  .cd-tracklist .track-num {
+    font-size: 11px;
+    color: var(--text-muted);
+    width: 16px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .cd-tracklist li.active .track-num { color: var(--gold); }
+
+  .cd-tracklist .track-name {
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .cd-tracklist li.active .track-name { color: var(--gold); }
+
+  .cd-tracklist .track-bars {
+    margin-left: auto;
+    display: none;
+    gap: 2px;
+    align-items: flex-end;
+    height: 14px;
+  }
+
+  .cd-tracklist li.active .track-bars { display: flex; }
+
+  .cd-tracklist .bar {
+    width: 3px;
+    background: var(--gold);
+    border-radius: 1px;
+    animation: barAnim 0.8s ease-in-out infinite alternate;
+  }
+  .bar:nth-child(1) { height: 60%; animation-delay: 0s; }
+  .bar:nth-child(2) { height: 100%; animation-delay: 0.15s; }
+  .bar:nth-child(3) { height: 70%; animation-delay: 0.3s; }
+  .bar:nth-child(4) { height: 40%; animation-delay: 0.1s; }
+
+  @keyframes barAnim {
+    from { transform: scaleY(0.4); }
+    to   { transform: scaleY(1); }
+  }
+
+  .cd-disc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cd-disc img {
+    width: 120px;
+    border-radius: 50%;
+  }
+
+  .cd-disc .label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .cd-meta {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── GENERAL LIST ── */
+  .song-list {
+    list-style: none;
+  }
+
+  .song-list li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: background 0.15s;
+  }
+
+  .song-list li:hover { background: var(--surface); }
+
+  .song-list li.active {
+    background: var(--active-bg);
+    border-left: 2px solid var(--active-border);
+  }
+
+  .song-list .num {
+    width: 28px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .song-list li.active .num { color: var(--gold); }
+
+  .song-list .name {
+    font-size: 14px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .song-list li.active .name { color: var(--gold-light); }
+
+  .song-list .bars {
+    display: none;
+    gap: 2px;
+    align-items: flex-end;
+    height: 14px;
+  }
+
+  .song-list li.active .bars { display: flex; }
+
+  /* ── PLAYER BAR ── */
+  #player-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #111;
+    border-top: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+  }
+
+  #player-bar .song-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #player-bar .now-playing {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  #player-bar .song-title {
+    font-size: 14px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #player-bar .controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .ctrl-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 6px;
+    border-radius: 50%;
+    transition: color 0.15s, background 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .ctrl-btn:hover { color: var(--gold); background: var(--surface2); }
+
+  .play-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .play-btn:hover { background: var(--gold-light); transform: scale(1.05); }
+
+  .progress-wrap {
+    flex: 2;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  #progress-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s linear;
+  }
+
+  .time-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .volume-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .volume-slider {
+    -webkit-appearance: none;
+    width: 80px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+  }
+
+  audio { display: none; }
+
+  /* responsive */
+  @media (max-width: 640px) {
+    .cd-card { grid-template-columns: 1fr; }
+    .cd-covers, .cd-disc { flex-direction: row; align-items: center; }
+    .progress-wrap, .volume-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-circle">A</div>
+  <div>
+    <h1>Abel Rubio</h1>
+    <p>Discografía · Canciones</p>
+  </div>
+</header>
+
+
+<main>
+
+  <!-- ── CD: Jesús, quien calmó mi tempestad ── -->
+  <div class="section-title">Álbum</div>
+
+  <div class="cd-card">
+    <div class="cd-covers">
+      <img src="cobert.jpg" alt="Portada" onerror="this.style.opacity=0.3">
+      <span class="label">Portada</span>
+    </div>
+
+    <div class="cd-info">
+      <div class="cd-label">Onaa</div>
+      <div class="cd-title">Jesús, quien calmó mi tempestad</div>
+      <div class="cd-artist">Abel &amp; Sara</div>
+
+      <ul class="cd-tracklist" id="cd-tracks">
+        <li data-src="canciones_arcd/nohaymasdioscomotu.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">1</span>
+          <span class="track-name">No hay más Dios como Tú</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/angeles.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">2</span>
+          <span class="track-name">Ángeles</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/gotaagota.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">3</span>
+          <span class="track-name">Gota a Gota</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/cuentalahistoria.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">4</span>
+          <span class="track-name">Cuenta la Historia</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/lagentequepasaba.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">5</span>
+          <span class="track-name">La gente que pasaba</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/diosdiosmio.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">6</span>
+          <span class="track-name">Dios, Dios mío</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/padredepadres.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">7</span>
+          <span class="track-name">Padre de padres</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/ohcuanbelloeselse%C3%B1or.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">8</span>
+          <span class="track-name">Oh cuán Bello es el Señor</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/dondedejaremoselamor.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">9</span>
+          <span class="track-name">Dónde dejaremos el Amor</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+        <li data-src="canciones_arcd/quieneseste.mp3" onclick="playSong(this,'cd')">
+          <span class="track-num">10</span>
+          <span class="track-name">¿Quién es éste?</span>
+          <div class="track-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </li>
+      </ul>
+
+      <div class="cd-meta">Producido por Abel Rubio Hidalgo · 2000 · OHAD</div>
+    </div>
+
+    <div class="cd-disc">
+      <img src="cd.png" alt="Disco" onerror="this.style.opacity=0.3">
+      <span class="label">Disco</span>
+    </div>
+  </div>
+
+  <!-- ── HISTORIA ── -->
+  <div class="historia-wrap" style="max-width:100%;margin:0 0 48px 0;padding:0;">
+    <div class="historia-box">
+      <p>No me di cuenta que la llama de la vela se estaba apagando. Sólo en mi corazón surgió correr por intentar grabar todas aquellas canciones que Dios había puesto en mi corazón, sin saber que iba a perder mi voz, mis ilusiones, mis sueños; se desvaneció todo en un día.</p>
+      <p>Pero gracias a los cassettes que grabé hoy puedo recordar como era mi voz, y pensar en mi adolescencia junto con todas mis ilusiones.</p>
+      <p>Mi primer CD casero a los 16 años… muchos esfuerzos y complicaciones, ya que en 1997 no habían ordenadores ni programas de música como los hay ahora.</p>
+      <div class="historia-credits">
+        <strong style="color:var(--gold);">2000 · Ohad</strong> — Abel &amp; Sara<br>
+        Título: <em>"Jesús quien calmó mi tempestad"</em><br>
+        Piano, Órgano, Guitarra y Bajo: <strong>Abel Rubio</strong> &nbsp;·&nbsp;
+        Batería: <strong>Josué Mateos</strong> &nbsp;·&nbsp;
+        Flauta: <strong>Raquel Rubio</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CANCIONES GENERALES (alfabético) ── -->
+  <div class="section-title">Todas las canciones</div>
+
+  <ul class="song-list" id="general-tracks">
+    <li data-src="alomejoresose.mp3" onclick="playSong(this,'general')">
+      <span class="num">1</span><span class="name">A lo mejor es eso</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="alabad.mp3" onclick="playSong(this,'general')">
+      <span class="num">2</span><span class="name">Alabad</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="alcantar.mp3" onclick="playSong(this,'general')">
+      <span class="num">3</span><span class="name">Alcántar</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="aleluya.mp3" onclick="playSong(this,'general')">
+      <span class="num">4</span><span class="name">Aleluya</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="aleluyah.mp3" onclick="playSong(this,'general')">
+      <span class="num">5</span><span class="name">Aleluyah</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="alzaremivoz.mp3" onclick="playSong(this,'general')">
+      <span class="num">6</span><span class="name">Alzaré mi voz</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="andasobreelmar.mp3" onclick="playSong(this,'general')">
+      <span class="num">7</span><span class="name">Anda sobre el mar</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="aquelsamaritano.mp3" onclick="playSong(this,'general')">
+      <span class="num">8</span><span class="name">Aquel samaritano</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="ata.mp3" onclick="playSong(this,'general')">
+      <span class="num">9</span><span class="name">Ata</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="ayudame.mp3" onclick="playSong(this,'general')">
+      <span class="num">10</span><span class="name">Ayúdame</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="bondad.mp3" onclick="playSong(this,'general')">
+      <span class="num">11</span><span class="name">Bondad</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="brujula.mp3" onclick="playSong(this,'general')">
+      <span class="num">12</span><span class="name">Brújula</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="caminos.mp3" onclick="playSong(this,'general')">
+      <span class="num">13</span><span class="name">Caminos</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="canondeadoracion.mp3" onclick="playSong(this,'general')">
+      <span class="num">14</span><span class="name">Canon de adoración</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="cantemoscongozo.mp3" onclick="playSong(this,'general')">
+      <span class="num">15</span><span class="name">Cantemos con gozo</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="cantoalrey.mp3" onclick="playSong(this,'general')">
+      <span class="num">16</span><span class="name">Canto al Rey</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="cielosytierrapasaran.mp3" onclick="playSong(this,'general')">
+      <span class="num">17</span><span class="name">Cielos y tierra pasarán</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="conmibalanza.mp3" onclick="playSong(this,'general')">
+      <span class="num">18</span><span class="name">Con mi balanza</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="confiaenel.mp3" onclick="playSong(this,'general')">
+      <span class="num">19</span><span class="name">Confía en él</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="creadordemivida.mp3" onclick="playSong(this,'general')">
+      <span class="num">20</span><span class="name">Creador de mi vida</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="cristoestaracontigo.mp3" onclick="playSong(this,'general')">
+      <span class="num">21</span><span class="name">Cristo estará contigo</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="cristoseaformadoenmi.mp3" onclick="playSong(this,'general')">
+      <span class="num">22</span><span class="name">Cristo sea formado en mí</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="damehijomio.mp3" onclick="playSong(this,'general')">
+      <span class="num">23</span><span class="name">Dame hijo mío</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="daniel.mp3" onclick="playSong(this,'general')">
+      <span class="num">24</span><span class="name">Daniel</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="delasdiez.mp3" onclick="playSong(this,'general')">
+      <span class="num">25</span><span class="name">De las diez</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="desdemicorazon.mp3" onclick="playSong(this,'general')">
+      <span class="num">26</span><span class="name">Desde mi corazón</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="desierto.mp3" onclick="playSong(this,'general')">
+      <span class="num">27</span><span class="name">Desierto</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="efectomariposa.mp3" onclick="playSong(this,'general')">
+      <span class="num">28</span><span class="name">Efecto mariposa</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="elalfarero.mp3" onclick="playSong(this,'general')">
+      <span class="num">29</span><span class="name">El alfarero</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="elamor.mp3" onclick="playSong(this,'general')">
+      <span class="num">30</span><span class="name">El amor</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="elarbol.mp3" onclick="playSong(this,'general')">
+      <span class="num">31</span><span class="name">El árbol</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="elsenor.mp3" onclick="playSong(this,'general')">
+      <span class="num">32</span><span class="name">El Señor</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="elvendra.mp3" onclick="playSong(this,'general')">
+      <span class="num">33</span><span class="name">Él vendrá</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="elviolin.mp3" onclick="playSong(this,'general')">
+      <span class="num">34</span><span class="name">El violín</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="esquehayhayhay.mp3" onclick="playSong(this,'general')">
+      <span class="num">35</span><span class="name">Es que hay, hay, hay</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="esclavoliberado.mp3" onclick="playSong(this,'general')">
+      <span class="num">36</span><span class="name">Esclavo liberado</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="espirituespiritu.mp3" onclick="playSong(this,'general')">
+      <span class="num">37</span><span class="name">Espíritu, espíritu</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="estandoatulado.mp3" onclick="playSong(this,'general')">
+      <span class="num">38</span><span class="name">Estando a tu lado</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="ester.mp3" onclick="playSong(this,'general')">
+      <span class="num">39</span><span class="name">Ester</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="estrellita.mp3" onclick="playSong(this,'general')">
+      <span class="num">40</span><span class="name">Estrellita</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="exaltale.mp3" onclick="playSong(this,'general')">
+      <span class="num">41</span><span class="name">Exáltale</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="faro.mp3" onclick="playSong(this,'general')">
+      <span class="num">42</span><span class="name">Faro</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="gozate.mp3" onclick="playSong(this,'general')">
+      <span class="num">43</span><span class="name">Gózate</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="hallegadoeltiempo.mp3" onclick="playSong(this,'general')">
+      <span class="num">44</span><span class="name">Ha llegado el tiempo</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="havenido.mp3" onclick="playSong(this,'general')">
+      <span class="num">45</span><span class="name">Ha venido</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="imagino.mp3" onclick="playSong(this,'general')">
+      <span class="num">46</span><span class="name">Imagino</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="javehprovee.mp3" onclick="playSong(this,'general')">
+      <span class="num">47</span><span class="name">Javeh provee</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="jesusinlove.mp3" onclick="playSong(this,'general')">
+      <span class="num">48</span><span class="name">Jesus in love</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="lacreacion.mp3" onclick="playSong(this,'general')">
+      <span class="num">49</span><span class="name">La creación</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="lafuentedevida.mp3" onclick="playSong(this,'general')">
+      <span class="num">50</span><span class="name">La fuente de vida</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="laguerra.mp3" onclick="playSong(this,'general')">
+      <span class="num">51</span><span class="name">La guerra</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="larosa.mp3" onclick="playSong(this,'general')">
+      <span class="num">52</span><span class="name">La rosa</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="lasoledad.mp3" onclick="playSong(this,'general')">
+      <span class="num">53</span><span class="name">La soledad</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="lavenidadecristo.mp3" onclick="playSong(this,'general')">
+      <span class="num">54</span><span class="name">La venida de Cristo</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="losmurosdejerico.mp3" onclick="playSong(this,'general')">
+      <span class="num">55</span><span class="name">Los muros de Jericó</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="mansedumbre.mp3" onclick="playSong(this,'general')">
+      <span class="num">56</span><span class="name">Mansedumbre</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="mensajesocultos.mp3" onclick="playSong(this,'general')">
+      <span class="num">57</span><span class="name">Mensajes ocultos</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="mibautismo.mp3" onclick="playSong(this,'general')">
+      <span class="num">58</span><span class="name">Mi bautismo</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="micastillo.mp3" onclick="playSong(this,'general')">
+      <span class="num">59</span><span class="name">Mi castillo</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="midiosmirey.mp3" onclick="playSong(this,'general')">
+      <span class="num">60</span><span class="name">Mi Dios, mi Rey</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="mipastor.mp3" onclick="playSong(this,'general')">
+      <span class="num">61</span><span class="name">Mi pastor</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="milagro.mp3" onclick="playSong(this,'general')">
+      <span class="num">62</span><span class="name">Milagro</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="miradcuanbueno.mp3" onclick="playSong(this,'general')">
+      <span class="num">63</span><span class="name">Mirad cuán bueno</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="necesitasadios.mp3" onclick="playSong(this,'general')">
+      <span class="num">64</span><span class="name">Necesitas a Dios</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="notedejesapagar.mp3" onclick="playSong(this,'general')">
+      <span class="num">65</span><span class="name">No te dejes apagar</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="ocurriounavez.mp3" onclick="playSong(this,'general')">
+      <span class="num">66</span><span class="name">Ocurrió una vez</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="ohmidiosdondeestas.mp3" onclick="playSong(this,'general')">
+      <span class="num">67</span><span class="name">Oh mi Dios, ¿dónde estás?</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="ohmipastor.mp3" onclick="playSong(this,'general')">
+      <span class="num">68</span><span class="name">Oh mi pastor</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="paciencia.mp3" onclick="playSong(this,'general')">
+      <span class="num">69</span><span class="name">Paciencia</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="palabras.mp3" onclick="playSong(this,'general')">
+      <span class="num">70</span><span class="name">Palabras... Soy feliz</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="palomamensajera.mp3" onclick="playSong(this,'general')">
+      <span class="num">71</span><span class="name">Paloma mensajera</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="porquealpensarenti.mp3" onclick="playSong(this,'general')">
+      <span class="num">72</span><span class="name">Porque al pensar en ti</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="quierosertuyo.mp3" onclick="playSong(this,'general')">
+      <span class="num">73</span><span class="name">Quiero ser tuyo</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="quierovenir.mp3" onclick="playSong(this,'general')">
+      <span class="num">74</span><span class="name">Quiero venir</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="sanson.mp3" onclick="playSong(this,'general')">
+      <span class="num">75</span><span class="name">Sansón</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="sentirtupresencia.mp3" onclick="playSong(this,'general')">
+      <span class="num">76</span><span class="name">Sentir tu presencia</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="sentirtusbesos.mp3" onclick="playSong(this,'general')">
+      <span class="num">77</span><span class="name">Sentir tus besos</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="sicondoblar.mp3" onclick="playSong(this,'general')">
+      <span class="num">78</span><span class="name">Si con doblar</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="sipudiera.mp3" onclick="playSong(this,'general')">
+      <span class="num">79</span><span class="name">Si pudiera</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="solamentepido.mp3" onclick="playSong(this,'general')">
+      <span class="num">80</span><span class="name">Solamente pido</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="solotu.mp3" onclick="playSong(this,'general')">
+      <span class="num">81</span><span class="name">Solo tú</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="tealabare.mp3" onclick="playSong(this,'general')">
+      <span class="num">82</span><span class="name">Te alabaré</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="tumano.mp3" onclick="playSong(this,'general')">
+      <span class="num">83</span><span class="name">Tu mano</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="tumibuenrefugio.mp3" onclick="playSong(this,'general')">
+      <span class="num">84</span><span class="name">Tú mi buen refugio</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="tupaz.mp3" onclick="playSong(this,'general')">
+      <span class="num">85</span><span class="name">Tu paz</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="unjovensoy.mp3" onclick="playSong(this,'general')">
+      <span class="num">86</span><span class="name">Un joven soy</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="venacantar.mp3" onclick="playSong(this,'general')">
+      <span class="num">87</span><span class="name">Ven a cantar</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="vivofeliz.mp3" onclick="playSong(this,'general')">
+      <span class="num">88</span><span class="name">Vivo feliz</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="yoquieroadorarte.mp3" onclick="playSong(this,'general')">
+      <span class="num">89</span><span class="name">Yo quiero adorarte</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="yosoysembrador.mp3" onclick="playSong(this,'general')">
+      <span class="num">90</span><span class="name">Yo soy sembrador</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="yoteamare.mp3" onclick="playSong(this,'general')">
+      <span class="num">91</span><span class="name">Yo te amaré</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="yoterespondere.mp3" onclick="playSong(this,'general')">
+      <span class="num">92</span><span class="name">Yo te responderé</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+    <li data-src="habeisvisto.mp3" onclick="playSong(this,'general')">
+      <span class="num">93</span><span class="name">¿Habéis visto?</span>
+      <div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </li>
+  </ul>
+
+</main>
+
+<!-- ── PLAYER BAR ── -->
+<div id="player-bar">
+  <div class="song-info">
+    <div class="now-playing">Reproduciendo</div>
+    <div class="song-title" id="bar-title">—</div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" onclick="prevSong()" title="Anterior">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+    </button>
+    <button class="play-btn" id="play-btn" onclick="togglePlay()">
+      <svg id="play-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="ctrl-btn" onclick="nextSong()" title="Siguiente">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6zm8.5-6v6h2V6h-2z"/></svg>
+    </button>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar" onclick="seek(event)">
+      <div id="progress-fill"></div>
+    </div>
+    <div class="time-row">
+      <span id="time-cur">0:00</span>
+      <span id="time-tot">0:00</span>
+    </div>
+  </div>
+
+  <div class="volume-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+    <input type="range" class="volume-slider" id="vol" min="0" max="1" step="0.05" value="0.8" oninput="setVolume(this.value)">
+  </div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+const audio = document.getElementById('audio');
+const barTitle = document.getElementById('bar-title');
+const playIcon = document.getElementById('play-icon');
+const progressFill = document.getElementById('progress-fill');
+const timeCur = document.getElementById('time-cur');
+const timeTot = document.getElementById('time-tot');
+
+let currentLi = null;
+let currentList = [];
+let currentIdx = -1;
+
+function fmt(s) {
+  if (isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60).toString().padStart(2, '0');
+  return m + ':' + sec;
+}
+
+function playSong(li, listId) {
+  if (currentLi) currentLi.classList.remove('active');
+  li.classList.add('active');
+  currentLi = li;
+
+  const src = li.dataset.src;
+  audio.src = src;
+  audio.volume = parseFloat(document.getElementById('vol').value);
+  audio.play();
+
+  const nameEl = li.querySelector('.track-name, .name');
+  barTitle.textContent = nameEl ? nameEl.textContent : '—';
+
+  setPlayIcon(true);
+
+  // build sibling list for prev/next
+  const parent = li.parentElement;
+  currentList = Array.from(parent.querySelectorAll('li'));
+  currentIdx = currentList.indexOf(li);
+}
+
+function togglePlay() {
+  if (!audio.src) return;
+  if (audio.paused) { audio.play(); setPlayIcon(true); }
+  else { audio.pause(); setPlayIcon(false); }
+}
+
+function setPlayIcon(playing) {
+  playIcon.innerHTML = playing
+    ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
+    : '<path d="M8 5v14l11-7z"/>';
+}
+
+function prevSong() {
+  if (currentList.length && currentIdx > 0) {
+    playSong(currentList[currentIdx - 1], '');
+  }
+}
+
+function nextSong() {
+  if (currentList.length && currentIdx < currentList.length - 1) {
+    playSong(currentList[currentIdx + 1], '');
+  }
+}
+
+function seek(e) {
+  if (!audio.duration) return;
+  const bar = e.currentTarget;
+  const ratio = e.offsetX / bar.offsetWidth;
+  audio.currentTime = ratio * audio.duration;
+}
+
+function setVolume(v) { audio.volume = parseFloat(v); }
+
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  progressFill.style.width = pct + '%';
+  timeCur.textContent = fmt(audio.currentTime);
+  timeTot.textContent = fmt(audio.duration);
+});
+
+audio.addEventListener('ended', nextSong);
+
+audio.addEventListener('pause', () => setPlayIcon(false));
+audio.addEventListener('play',  () => setPlayIcon(true));
+</script>
+</body>
+</html>
