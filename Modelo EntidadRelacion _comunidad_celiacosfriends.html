@@ -1,0 +1,192 @@
+
+<style>
+#erd2 { padding: 0.5rem 0; }
+#erd2 svg { width: 100%; }
+.erd-title2 { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--color-border-tertiary); }
+</style>
+<div class="erd-title2">Tablas de comunidad — recetas, quedadas, restaurantes, viajes, experiencias y celiacos online</div>
+<div id="erd2"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#26215c' : '#eeedfe',
+    primaryBorderColor: dark ? '#534ab7' : '#534ab7',
+    primaryTextColor: dark ? '#cecbf6' : '#3c3489',
+  },
+});
+const diagram = `erDiagram
+  perfiles {
+    uuid user_id PK
+    text nick
+    text avatar_url
+  }
+  presencia_historial {
+    uuid user_id PK
+    text nombre
+    text ini
+    text foto_url
+    text ciudad
+    timestamp ultima_vez
+    timestamp updated_at
+  }
+  comunidad_recetas {
+    uuid id PK
+    uuid receta_id FK
+    uuid user_id FK
+    uuid autor_user_id FK
+    int likes_count
+    bool activa
+    timestamp publicado_en
+  }
+  comunidad_recetas_likes {
+    uuid com_receta_id FK
+    uuid user_id FK
+    int voto
+    timestamp created_at
+  }
+  comunidad_quedadas {
+    uuid id PK
+    uuid quedada_id FK
+    uuid user_id FK
+    uuid autor_user_id FK
+    int likes_count
+    bool activa
+    timestamp publicado_en
+  }
+  comunidad_quedadas_likes {
+    uuid com_quedada_id FK
+    uuid user_id FK
+    int voto
+    timestamp created_at
+  }
+  comunidad_restaurantes {
+    uuid id PK
+    uuid restaurante_id FK
+    uuid user_id FK
+    uuid autor_user_id FK
+    text nombre
+    text direccion
+    numeric puntuacion
+    int likes_count
+    timestamp created_at
+  }
+  comunidad_restaurantes_likes {
+    uuid com_restaurante_id FK
+    uuid user_id FK
+    int voto
+    timestamp created_at
+  }
+  comunidad_viajes {
+    uuid id PK
+    uuid viaje_id FK
+    uuid user_id FK
+    uuid autor_user_id FK
+    text destino
+    text emoji
+    text fecha_iso
+    numeric puntuacion
+    int likes_count
+    timestamp created_at
+  }
+  comunidad_viajes_likes {
+    uuid com_viaje_id FK
+    uuid user_id FK
+    int voto
+    timestamp created_at
+  }
+  comunidad_experiencias {
+    uuid id PK
+    uuid experiencia_id FK
+    uuid user_id FK
+    uuid autor_user_id FK
+    text destino
+    text texto
+    int estrellas
+    int likes_count
+    timestamp created_at
+  }
+  comunidad_experiencias_likes {
+    uuid com_experiencia_id FK
+    uuid user_id FK
+    int voto
+    timestamp created_at
+  }
+  mis_recetas {
+    uuid id PK
+    uuid user_id FK
+    text titulo
+  }
+  mis_quedadas {
+    uuid id PK
+    uuid user_id FK
+    text nombre
+  }
+  mis_restaurantes {
+    uuid id PK
+    uuid user_id FK
+    text nombre
+  }
+  mis_viajes {
+    uuid id PK
+    uuid user_id FK
+    text destino
+  }
+  mis_experiencias {
+    uuid id PK
+    uuid user_id FK
+    text destino
+  }
+
+  perfiles ||--o{ presencia_historial : "registra presencia"
+  perfiles ||--o{ comunidad_recetas : "publica"
+  perfiles ||--o{ comunidad_quedadas : "publica"
+  perfiles ||--o{ comunidad_restaurantes : "publica"
+  perfiles ||--o{ comunidad_viajes : "publica"
+  perfiles ||--o{ comunidad_experiencias : "publica"
+  mis_recetas ||--|| comunidad_recetas : "referencia"
+  mis_quedadas ||--|| comunidad_quedadas : "referencia"
+  mis_restaurantes ||--|| comunidad_restaurantes : "referencia"
+  mis_viajes ||--|| comunidad_viajes : "referencia"
+  mis_experiencias ||--|| comunidad_experiencias : "referencia"
+  comunidad_recetas ||--o{ comunidad_recetas_likes : "recibe"
+  comunidad_quedadas ||--o{ comunidad_quedadas_likes : "recibe"
+  comunidad_restaurantes ||--o{ comunidad_restaurantes_likes : "recibe"
+  comunidad_viajes ||--o{ comunidad_viajes_likes : "recibe"
+  comunidad_experiencias ||--o{ comunidad_experiencias_likes : "recibe"
+`;
+const { svg } = await mermaid.render('erd2-svg', diagram);
+document.getElementById('erd2').innerHTML = svg;
+document.querySelectorAll('#erd2 svg .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill','stroke','stroke-width','class','style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+document.querySelectorAll('#erd2 svg .row-rect-odd path, #erd2 svg .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>
