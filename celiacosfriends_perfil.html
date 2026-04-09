@@ -11286,6 +11286,8 @@ async function _comCargarRecetasDeSupabase() {
           querySelector: (sel) => {
             if (sel === '.mini-receta-name') return { textContent: card.dataset.titulo };
             if (sel === '.mini-receta-autor-nombre') return { textContent: card.dataset.autor };
+            if (sel === '.like-btn') return card.querySelector('.like-btn');
+            if (sel === '.bookmark-btn') return card.querySelector('.bookmark-btn');
             return null;
           }
         };
