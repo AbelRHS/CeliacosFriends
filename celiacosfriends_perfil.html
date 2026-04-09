@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<link rel="icon" type="image/png" href="logo_original.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CeliacosFriends – Perfil</title>
+<!-- BUILD v5 - navegación por teclado en selector de ciudades -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:#3a9a9a;--teal-dark:#2a7a7a;--green:#5aaa6a;--green-dark:#3a8a4a;
+    --gold:#e8a830;--bg:#f0f8f8;--text:#1a3a3a;--text-light:#5a7a7a;
+    --shadow:0 4px 20px rgba(58,154,154,0.12);--radius:18px;--sidebar-w:210px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;scrollbar-width:none;}
+  body::-webkit-scrollbar{display:none;}
+  html{scrollbar-width:none;}
+  html::-webkit-scrollbar{display:none;}
+
+  /* SIDEBAR */
+  .sidebar{width:var(--sidebar-w);background:white;height:100vh;position:fixed;left:0;top:0;display:flex;flex-direction:column;box-shadow:2px 0 16px rgba(58,154,154,0.08);z-index:100;overflow-y:auto;scrollbar-width:none;}
+  .sidebar::-webkit-scrollbar{display:none;}
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid #e8f4f4;flex-direction:column;text-align:center;}
+  .sidebar-logo img{width:48px;height:48px;}
+  .logo-text{font-weight:900;font-size:1rem;color:var(--teal-dark);}
+  .logo-text span{color:var(--green-dark);}
+  .logo-sub{font-size:0.65rem;color:var(--text-light);font-weight:600;letter-spacing:0.8px;text-transform:uppercase;}
+  .sidebar-section{padding:16px 12px 8px;}
+  .section-label{font-size:0.7rem;font-weight:800;color:var(--text-light);letter-spacing:1.2px;text-transform:uppercase;padding:0 8px;margin-bottom:6px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;cursor:pointer;font-weight:700;font-size:0.92rem;color:var(--text-light);transition:all 0.2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left;}
+  .nav-item:hover{background:var(--bg);color:var(--teal-dark);}
+  .nav-item.active{background:linear-gradient(135deg,rgba(58,154,154,0.12),rgba(90,170,106,0.08));color:var(--teal-dark);}
+  .nav-item .icon{font-size:1.1rem;width:22px;text-align:center;}
+  .badge{margin-left:auto;background:var(--teal);color:white;border-radius:50px;font-size:0.7rem;padding:2px 7px;font-weight:800;}
+  .badge.green{background:var(--green);}
+  .sidebar-user{margin-top:auto;padding:11px 12px 11px 22px;border-top:1px solid #e8f4f4;display:flex;align-items:center;gap:10px;cursor:pointer;}.sidebar a{text-decoration:none;color:inherit;}
+  .user-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:1rem;flex-shrink:0;}
+
+  /* MAIN */
+  .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;}
+  .content{padding:0;}
+
+  /* COVER + AVATAR */
+  .profile-cover{height:110px;border-radius:0;background:linear-gradient(135deg,#1a6a8a,#2a9a6a,#3aaa8a);position:relative;margin-bottom:8px;overflow:visible;}
+  .profile-inner{padding:0 28px 24px;}
+  .cover-pattern{position:absolute;inset:0;border-radius:var(--radius);background-image:radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 40%);}
+  .cover-tooltip{
+    position:absolute; top:4px; right:12px;
+    font-size:1.5rem; pointer-events:none; opacity:0; transition:opacity 0.2s; z-index:10;
+  }
+  .profile-cover:hover .cover-tooltip{ opacity:0; }
+  .profile-cover:hover{ filter:brightness(0.82); }
+  .profile-cover.menu-open{ filter:none !important; }
+  #cover-menu{ z-index:200 !important; }
+
+  .profile-avatar-wrap{position:absolute;bottom:-30px;left:28px;}
+  .profile-avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:900;color:white;border:5px solid white;box-shadow:0 8px 24px rgba(58,154,154,0.3);}
+  .avatar-online{position:absolute;bottom:6px;right:6px;width:20px;height:20px;background:#4cdb6e;border-radius:50%;border:3px solid white;}
+
+  /* PROFILE HEADER */
+  .profile-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;padding-top:20px;}
+  .profile-info .pname{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--text);}
+  .pmeta-list{display:grid;grid-template-columns:auto auto;gap:3px 20px;margin-top:5px;}
+  .pmeta-row{font-size:0.83rem;color:var(--text-light);font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+  .profile-actions{display:flex;gap:10px;}
+  .paction{padding:10px 20px;border-radius:50px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.88rem;cursor:pointer;transition:all 0.2s;}
+  .paction.primary{background:linear-gradient(135deg,var(--teal),var(--green));color:white;box-shadow:0 4px 12px rgba(58,154,154,0.3);}
+  .paction.primary:hover{transform:translateY(-2px);}
+  .paction.secondary{background:white;border:2px solid #e0eeee;color:var(--teal-dark);}
+  .paction.secondary:hover{border-color:var(--teal);}
+  .paction.danger{background:white;border:2px solid #ffdddd;color:#cc4444;}
+  .paction.danger.bloqueado-activo{background:#cc4444;border-color:#cc4444;color:white;box-shadow:0 4px 12px rgba(204,68,68,0.35);}
+  .paction.danger.bloqueado-activo:hover{background:#aa2222;border-color:#aa2222;}
+  .paction.online-btn{background:linear-gradient(135deg,var(--teal),var(--green));color:white;box-shadow:0 4px 12px rgba(76,219,110,0.3);display:flex;align-items:center;gap:7px;transition:all 0.2s;}
+  .paction.online-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(76,219,110,0.4);}
+  .paction.offline-btn{background:white;border:2px solid #e0e0e0;color:#888;display:flex;align-items:center;gap:7px;}
+  .paction.offline-btn:hover{border-color:#aaa;}
+  .status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .status-dot.on{background:#fff;}
+  .status-dot.off{background:#bbb;}
+  .avatar-online.hidden{display:none;}
+  .avatar-online.offline-indicator{background:#bbb;}
+  #avatar-dot:hover{ box-shadow: 0 0 0 3px rgba(255,255,255,0.8), 0 0 0 5px rgba(0,0,0,0.15); }
+  .avatar-edit-icon{
+    position:absolute; bottom:-4px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.55); color:white; border-radius:50px;
+    font-size:0.65rem; padding:3px 8px; pointer-events:none;
+    opacity:0; transition:opacity 0.2s; white-space:nowrap;
+  }
+  .profile-avatar-wrap:hover .avatar-edit-icon{ opacity:0; }
+  .profile-avatar:hover{ filter: brightness(0.82); }
+  .avatar-tooltip{
+    position:absolute; bottom:-38px; left:50%; transform:translateX(-50%);
+    background:#1a3a3a; color:white; border-radius:10px;
+    font-size:0.82rem; font-weight:700; padding:7px 14px;
+    pointer-events:none; opacity:0; transition:opacity 0.2s;
+    white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.2); z-index:10;
+  }
+  .avatar-tooltip::before{
+    content:''; position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    border-width:0 6px 6px; border-style:solid;
+    border-color:transparent transparent #1a3a3a;
+  }
+  .profile-avatar-wrap:hover .avatar-tooltip{ opacity:1; }
+
+  /* STATS ROW */
+  .stats-row{display:flex;gap:16px;margin-bottom:24px;}
+  .stat-card{background:white;border-radius:14px;padding:16px 20px;box-shadow:var(--shadow);text-align:center;flex:1;}
+  .stat-num{font-size:1.5rem;font-weight:900;color:var(--teal-dark);}
+  .stat-label{font-size:0.75rem;color:var(--text-light);font-weight:600;margin-top:2px;}
+
+  /* LAYOUT */
+  .profile-grid{display:grid;grid-template-columns:1fr 320px;gap:20px;}
+
+  /* TABS */
+  .tabs{display:flex;gap:4px;background:white;border-radius:14px;padding:5px;box-shadow:var(--shadow);margin-bottom:20px;}
+  .tab{flex:1;padding:10px 6px;border:none;background:transparent;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;color:var(--text-light);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.2;}
+  .tab .tab-icon{font-size:1.4rem;line-height:1;}
+  .tab img.tab-icon{width:22px;height:22px;object-fit:cover;margin-bottom:-2px;}
+  .tab.active{background:linear-gradient(135deg,var(--teal),var(--green));color:white;box-shadow:0 2px 8px rgba(58,154,154,0.25);}
+
+  /* TAB CONTENT */
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  /* SOBRE MÍ */
+  .info-card{background:white;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px;}
+  .info-card h3{font-weight:900;font-size:0.95rem;margin-bottom:14px;color:var(--text);}
+  .info-bio{font-size:0.9rem;color:var(--text-light);line-height:1.7;}
+  .info-fields{display:grid;gap:12px;}
+  .info-field{display:flex;flex-direction:column;gap:4px;}
+  .info-field label{font-size:0.75rem;font-weight:800;color:var(--text-light);letter-spacing:0.5px;text-transform:uppercase;}
+  .info-value{display:flex;align-items:center;gap:7px;font-size:0.9rem;color:var(--text);font-weight:600;}
+  .edit-overlay{position:fixed;inset:0;background:rgba(26,58,58,0.4);display:flex;align-items:center;justify-content:center;z-index:500;display:none;}
+  .edit-modal{background:white;border-radius:var(--radius);padding:24px;width:90%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+  .edit-modal h3{margin-bottom:16px;}
+  .edit-form{display:grid;gap:14px;}
+  .edit-form input, .edit-form textarea, .edit-form select{
+    width:100%;
+    padding:11px 14px;
+    border:2px solid #e0eeee;
+    border-radius:10px;
+    font-family:'Nunito',sans-serif;
+    font-size:0.88rem;
+    color:var(--text);
+    transition:border-color 0.2s;
+  }
+  .edit-form input:focus, .edit-form textarea:focus, .edit-form select:focus{
+    outline:none;
+    border-color:var(--teal);
+  }
+  .edit-form textarea{resize:vertical;min-height:80px;}
+  .edit-btns{display:flex;gap:10px;margin-top:6px;}
+  .edit-btn{padding:10px 20px;border-radius:50px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.88rem;cursor:pointer;transition:all 0.2s;flex:1;}
+  .edit-btn.save{background:linear-gradient(135deg,var(--teal),var(--green));color:white;box-shadow:0 4px 12px rgba(58,154,154,0.3);}
+  .edit-btn.save:hover{transform:translateY(-2px);}
+  .edit-btn.cancel{background:white;border:2px solid #e0eeee;color:var(--text-light);}
+  .edit-btn.cancel:hover{border-color:var(--teal);}
+
+  /* KEYBOARD NAVIGATION INDICATOR */
+  .keyboard-hint {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
+    color: var(--text-light);
+    font-weight: 600;
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  select:focus + .keyboard-hint {
+    opacity: 0.8;
+  }
+
+  /* RECETAS */
+  .recipes-grid{display:grid;gap:16px;}
+  .recipe-card{background:white;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;}
+  .recipe-header{display:flex;align-items:flex-start;gap:14px;}
+  .recipe-img{width:80px;height:80px;border-radius:12px;object-fit:cover;flex-shrink:0;background:linear-gradient(135deg,rgba(58,154,154,0.1),rgba(90,170,106,0.1));}
+  .recipe-info{flex:1;}
+  .recipe-title{font-weight:900;font-size:0.95rem;color:var(--text);margin-bottom:4px;}
+  .recipe-desc{font-size:0.82rem;color:var(--text-light);line-height:1.5;}
+  .recipe-meta{display:flex;gap:14px;font-size:0.78rem;color:var(--text-light);font-weight:600;}
+  .recipe-actions{display:flex;gap:8px;}
+  .recipe-btn{padding:8px 16px;border-radius:50px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+  .recipe-btn.view{background:linear-gradient(135deg,var(--teal),var(--green));color:white;}
+  .recipe-btn.view:hover{transform:translateY(-1px);}
+  .recipe-btn.like{background:white;border:2px solid #e0eeee;color:var(--text-light);}
+  .recipe-btn.like:hover{border-color:var(--teal);}
+
+  /* MIS RECETAS */
+  .own-recipes-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .add-recipe-btn{padding:10px 20px;border-radius:50px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.88rem;cursor:pointer;background:linear-gradient(135deg,var(--teal),var(--green));color:white;box-shadow:0 4px 12px rgba(58,154,154,0.3);transition:all 0.2s;}
+  .add-recipe-btn:hover{transform:translateY(-2px);}
+
+  /* MIS OPINIONES */
+  .opinions-list{display:grid;gap:12px;}
+  .opinion-card{background:white;border-radius:14px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;}
+  .opinion-header{display:flex;justify-content:space-between;align-items:flex-start;}
+  .opinion-product{font-weight:700;font-size:0.88rem;color:var(--text);}
+  .opinion-date{font-size:0.72rem;color:var(--text-light);font-weight:600;}
+  .opinion-stars{display:flex;gap:2px;font-size:0.9rem;}
+  .opinion-text{font-size:0.85rem;color:var(--text-light);line-height:1.6;}
+
+  /* CONTACTAR */
+  .contact-card{background:white;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);text-align:center;}
+  .contact-card .icon{font-size:2.5rem;margin-bottom:10px;}
+  .contact-card h3{margin-bottom:8px;font-size:1.1rem;}
+  .contact-card p{font-size:0.85rem;color:var(--text-light);line-height:1.6;margin-bottom:16px;}
+  .contact-btn{padding:12px 24px;border-radius:50px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.88rem;cursor:pointer;background:linear-gradient(135deg,var(--teal),var(--green));color:white;box-shadow:0 4px 12px rgba(58,154,154,0.3);transition:all 0.2s;}
+  .contact-btn:hover{transform:translateY(-2px);}
+
+  /* RIGHT SIDEBAR */
+  .right-sidebar{display:flex;flex-direction:column;gap:16px;}
+  .widget{background:white;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+  .widget h4{font-weight:900;font-size:0.88rem;margin-bottom:12px;color:var(--text);}
+  .interest-tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .interest-tag{padding:6px 12px;border-radius:50px;background:linear-gradient(135deg,rgba(58,154,154,0.12),rgba(90,170,106,0.08));color:var(--teal-dark);font-size:0.78rem;font-weight:700;}
+  .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+  .gallery-img{width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;background:linear-gradient(135deg,rgba(58,154,154,0.1),rgba(90,170,106,0.1));}
+
+  /* RESPONSIVE */
+  @media(max-width:1100px){
+    .profile-grid{grid-template-columns:1fr;}
+    .right-sidebar{display:none;}
+  }
+  @media(max-width:800px){
+    :root{--sidebar-w:0px;}
+    .sidebar{transform:translateX(-100%);transition:transform 0.3s;}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0;}
+  }
+
+  /* ANIMATIONS */
+  @keyframes modalIn{
+    from{opacity:0;transform:scale(0.92);}
+    to{opacity:1;transform:scale(1);}
+  }
+
+  /* NOTIFICATION */
+  .notif-bubble{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+    background:#1a6a4a; color:white; padding:12px 22px; border-radius:50px;
+    font-family:'Nunito',sans-serif; font-weight:700; font-size:0.85rem;
+    box-shadow:0 8px 24px rgba(26,106,74,0.4);
+    opacity:0; pointer-events:none; transition:opacity 0.3s;
+    z-index:1000;
+  }
+  .notif-bubble.show{ opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <img src="logo_original.png" alt="Logo">
+    <div class="logo-text">Celiacos<span>Friends</span></div>
+    <div class="logo-sub">Tu comunidad sin gluten</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Principal</div>
+    <button class="nav-item"><span class="icon">🏠</span> Inicio</button>
+    <button class="nav-item"><span class="icon">🔍</span> Explorar</button>
+    <button class="nav-item"><span class="icon">🍴</span> Recetas</button>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Social</div>
+    <button class="nav-item"><span class="icon">👥</span> Amigos <span class="badge">3</span></button>
+    <button class="nav-item"><span class="icon">💬</span> Mensajes <span class="badge green">2</span></button>
+    <button class="nav-item"><span class="icon">🔔</span> Notificaciones</button>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Personal</div>
+    <button class="nav-item active"><span class="icon">👤</span> Mi Perfil</button>
+    <button class="nav-item"><span class="icon">⭐</span> Favoritos</button>
+    <button class="nav-item"><span class="icon">⚙️</span> Ajustes</button>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="user-av">A</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-weight:800;font-size:0.82rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Abel</div>
+      <div style="font-size:0.7rem;color:var(--text-light);font-weight:600;">@AR83</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+  <div class="content">
+    <!-- Cover -->
+    <div class="profile-cover">
+      <div class="cover-pattern"></div>
+      <div class="cover-tooltip">🖼️</div>
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar">A</div>
+        <div class="avatar-online" id="avatar-dot"></div>
+        <div class="avatar-edit-icon">📸 Cambiar</div>
+        <div class="avatar-tooltip">Haz clic para cambiar tu foto</div>
+      </div>
+    </div>
+
+    <div class="profile-inner">
+      <!-- Header -->
+      <div class="profile-header">
+        <div class="profile-info">
+          <div class="pname">Abel</div>
+          <div class="pmeta-list">
+            <div class="pmeta-row">📍 Madrid, España</div>
+            <div class="pmeta-row" id="status-text">🟢 Online ahora</div>
+            <div class="pmeta-row">📅 Miembro desde 2026</div>
+            <div class="pmeta-row">👑 Miembro fundador</div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="paction online-btn" id="toggle-online">
+            <span class="status-dot on"></span> Online
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num">20</div>
+          <div class="stat-label">Likes recibidos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">1</div>
+          <div class="stat-label">Recetas</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(0)">
+          <span class="tab-icon">👤</span>
+          Sobre mí
+        </button>
+        <button class="tab" onclick="switchTab(1)">
+          <span class="tab-icon">📖</span>
+          Mis Recetas
+        </button>
+        <button class="tab" onclick="switchTab(2)">
+          <span class="tab-icon">💡</span>
+          Mis Opiniones
+        </button>
+        <button class="tab" onclick="switchTab(3)">
+          <span class="tab-icon">📧</span>
+          Contactar
+        </button>
+      </div>
+
+      <!-- Profile Grid -->
+      <div class="profile-grid">
+        <!-- Left Column (Tabs Content) -->
+        <div>
+          <!-- TAB 0: Sobre mí -->
+          <div class="tab-content active">
+            <div class="info-card">
+              <h3>👤 Sobre mí</h3>
+              <p class="info-bio" id="bio-text">¡Hola! Soy Abel, celíaco desde los 19 años. Me apasiona la cocina sin gluten y estoy aquí para conocer a otras personas que entienden lo que es vivir con celíaquía y compartir trucos, recetas y experiencias.</p>
+            </div>
+
+            <div class="info-card">
+              <h3>📋 Información personal</h3>
+              <div class="info-fields">
+                <div class="info-field">
+                  <label>Ciudad</label>
+                  <div class="info-value" id="city-display">📍 Madrid, España</div>
+                </div>
+                <div class="info-field">
+                  <label>Intereses</label>
+                  <div class="info-value" id="interests-display">🎬 Cine · 🏊 Natación</div>
+                </div>
+              </div>
+              <button class="paction primary" style="margin-top:14px;width:100%;" onclick="openEditProfile()">✏️ Editar Perfil</button>
+            </div>
+          </div>
+
+          <!-- TAB 1: Mis Recetas -->
+          <div class="tab-content">
+            <div class="own-recipes-top">
+              <h3 style="font-size:1.05rem;font-weight:900;color:var(--text);">Mis Recetas</h3>
+              <button class="add-recipe-btn">➕ Nueva Receta</button>
+            </div>
+            <div class="recipes-grid">
+              <div class="recipe-card">
+                <div class="recipe-header">
+                  <div class="recipe-img"></div>
+                  <div class="recipe-info">
+                    <div class="recipe-title">Bizcocho de chocolate sin gluten</div>
+                    <div class="recipe-desc">Un bizcocho esponjoso y chocolateado, perfecto para el desayuno o la merienda.</div>
+                    <div class="recipe-meta">
+                      <span>⏱️ 45 min</span>
+                      <span>👥 6 personas</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="recipe-actions">
+                  <button class="recipe-btn view">👁️ Ver Receta</button>
+                  <button class="recipe-btn like">❤️ 12</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: Mis Opiniones -->
+          <div class="tab-content">
+            <h3 style="font-size:1.05rem;font-weight:900;color:var(--text);margin-bottom:16px;">Mis Opiniones</h3>
+            <div class="opinions-list">
+              <div class="opinion-card">
+                <div class="opinion-header">
+                  <div class="opinion-product">Pan de molde Schär</div>
+                  <div class="opinion-date">Hace 2 días</div>
+                </div>
+                <div class="opinion-stars">⭐⭐⭐⭐⭐</div>
+                <p class="opinion-text">Muy bueno para tostadas. Mantiene bien la textura y no se desmiga tanto como otras marcas.</p>
+              </div>
+              <div class="opinion-card">
+                <div class="opinion-header">
+                  <div class="opinion-product">Galletas María sin gluten</div>
+                  <div class="opinion-date">Hace 1 semana</div>
+                </div>
+                <div class="opinion-stars">⭐⭐⭐⭐</div>
+                <p class="opinion-text">Buenas, aunque un poco secas. Ideales con café o leche.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: Contactar -->
+          <div class="tab-content">
+            <div class="contact-card">
+              <div class="icon">💬</div>
+              <h3>Enviar mensaje a Abel</h3>
+              <p>¿Quieres ponerte en contacto? Envía un mensaje directo y te responderé lo antes posible.</p>
+              <button class="contact-btn">📧 Enviar Mensaje</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="right-sidebar">
+          <div class="widget">
+            <h4>🏷️ Intereses</h4>
+            <div class="interest-tags">
+              <div class="interest-tag">Cine</div>
+              <div class="interest-tag">Natación</div>
+            </div>
+          </div>
+          <div class="widget">
+            <h4>📸 Galería</h4>
+            <div class="gallery-grid">
+              <div class="gallery-img"></div>
+              <div class="gallery-img"></div>
+              <div class="gallery-img"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="edit-overlay" id="edit-overlay">
+  <div class="edit-modal">
+    <h3>✏️ Editar Perfil</h3>
+    <div class="edit-form">
+      <div>
+        <label style="font-size:0.75rem;font-weight:800;color:var(--text-light);text-transform:uppercase;display:block;margin-bottom:6px;">Biografía</label>
+        <textarea id="edit-bio" placeholder="Cuéntanos sobre ti...">¡Hola! Soy Abel, celíaco desde los 19 años. Me apasiona la cocina sin gluten y estoy aquí para conocer a otras personas que entienden lo que es vivir con celíaquía y compartir trucos, recetas y experiencias.</textarea>
+      </div>
+      <div style="position:relative;">
+        <label style="font-size:0.75rem;font-weight:800;color:var(--text-light);text-transform:uppercase;display:block;margin-bottom:6px;">Ciudad</label>
+        <select id="edit-city">
+          <option value="Álava">Álava</option>
+          <option value="Albacete">Albacete</option>
+          <option value="Alicante">Alicante</option>
+          <option value="Almería">Almería</option>
+          <option value="Asturias">Asturias</option>
+          <option value="Ávila">Ávila</option>
+          <option value="Badajoz">Badajoz</option>
+          <option value="Baleares">Baleares</option>
+          <option value="Barcelona">Barcelona</option>
+          <option value="Burgos">Burgos</option>
+          <option value="Cáceres">Cáceres</option>
+          <option value="Cádiz">Cádiz</option>
+          <option value="Cantabria">Cantabria</option>
+          <option value="Castellón">Castellón</option>
+          <option value="Ceuta">Ceuta</option>
+          <option value="Ciudad Real">Ciudad Real</option>
+          <option value="Córdoba">Córdoba</option>
+          <option value="Cuenca">Cuenca</option>
+          <option value="Girona">Girona</option>
+          <option value="Granada">Granada</option>
+          <option value="Guadalajara">Guadalajara</option>
+          <option value="Guipúzcoa">Guipúzcoa</option>
+          <option value="Huelva">Huelva</option>
+          <option value="Huesca">Huesca</option>
+          <option value="Jaén">Jaén</option>
+          <option value="La Coruña">La Coruña</option>
+          <option value="La Rioja">La Rioja</option>
+          <option value="Las Palmas">Las Palmas</option>
+          <option value="León">León</option>
+          <option value="Lleida">Lleida</option>
+          <option value="Lugo">Lugo</option>
+          <option value="Madrid" selected>Madrid</option>
+          <option value="Málaga">Málaga</option>
+          <option value="Melilla">Melilla</option>
+          <option value="Murcia">Murcia</option>
+          <option value="Navarra">Navarra</option>
+          <option value="Ourense">Ourense</option>
+          <option value="Palencia">Palencia</option>
+          <option value="Pontevedra">Pontevedra</option>
+          <option value="Salamanca">Salamanca</option>
+          <option value="Segovia">Segovia</option>
+          <option value="Sevilla">Sevilla</option>
+          <option value="Soria">Soria</option>
+          <option value="Tarragona">Tarragona</option>
+          <option value="Tenerife">Tenerife</option>
+          <option value="Teruel">Teruel</option>
+          <option value="Toledo">Toledo</option>
+          <option value="Valencia">Valencia</option>
+          <option value="Valladolid">Valladolid</option>
+          <option value="Vizcaya">Vizcaya</option>
+          <option value="Zamora">Zamora</option>
+          <option value="Zaragoza">Zaragoza</option>
+        </select>
+        <span class="keyboard-hint">A-Z ⌨️</span>
+      </div>
+      <div>
+        <label style="font-size:0.75rem;font-weight:800;color:var(--text-light);text-transform:uppercase;display:block;margin-bottom:6px;">Intereses (separados por comas)</label>
+        <input type="text" id="edit-interests" placeholder="Ej: Cine, Natación, Lectura" value="Cine, Natación">
+      </div>
+    </div>
+    <div class="edit-btns">
+      <button class="edit-btn cancel" onclick="closeEditProfile()">Cancelar</button>
+      <button class="edit-btn save" onclick="saveProfile()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Bubble -->
+<div class="notif-bubble" id="notif-bubble"></div>
+
+<!-- Modal de Bienvenida -->
+<div id="bienvenida-overlay" style="
+  display:none;
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(26,58,58,0.75);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+  animation:fadeIn 0.35s ease-out;
+">
+  <div style="
+    background:white;border-radius:20px;
+    width:480px;max-width:94vw;max-height:90vh;
+    box-shadow:0 24px 70px rgba(0,0,0,0.28);
+    animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    display:flex;flex-direction:column;
+  ">
+    <!-- Banner verde degradado igual al de bloqueo -->
+    <div style="
+      background:linear-gradient(135deg,#1a6a4a,#2a9a6a,#3aaa5a);
+      padding:20px 28px 18px;
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      flex-shrink:0;
+    ">
+      <div style="font-size:2.2rem;line-height:1;">💚</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;color:white;text-align:center;line-height:1.3;letter-spacing:0.2px;">
+        Bienvenidos a CeliacosFriends
+      </div>
+      <div style="font-family:'Nunito',sans-serif;font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:600;text-align:center;">
+        Un proyecto de corazón (y código)
+      </div>
+    </div>
+
+    <!-- Cuerpo con scroll -->
+    <div style="padding:22px 26px 8px;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:#c0e0d0 transparent;">
+
+      <p style="font-family:'Nunito',sans-serif;font-size:0.88rem;color:#1a3a3a;line-height:1.7;margin:0 0 16px;">
+        ¡Hola a todos! Quiero daros la bienvenida a CeliacosFriends. Antes de que empecéis a navegar, me gustaría compartir con vosotros la historia detrás de esta web y, lo más importante, cómo debemos usarla entre todos.
+      </p>
+
+      <!-- Sección origen -->
+      <div style="background:#f0f8f4;border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:0.88rem;color:#1a6a4a;margin-bottom:8px;">🚀 El origen de este proyecto</div>
+        <p style="font-family:'Nunito',sans-serif;font-size:0.83rem;color:#2a4a3a;line-height:1.65;margin:0;">
+          Este sitio nació de una idea sencilla: <strong>ayudar al colectivo celíaco</strong>. Sin embargo, tengo que ser sincero: mis conocimientos técnicos son muy limitados. Si esta web existe hoy, es gracias al avance de la Inteligencia Artificial (especialmente a Claude), que me ha ayudado con el <strong>95% del desarrollo</strong>. Sin estas herramientas, este proyecto habría sido imposible para alguien como yo.
+        </p>
+      </div>
+
+      <!-- Sección aviso -->
+      <div style="background:#fff8f0;border-radius:14px;padding:14px 16px;margin-bottom:14px;border-left:3px solid #e8a830;">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:0.88rem;color:#8a5a10;margin-bottom:10px;">⚠️ Un aviso importante (Uso con precaución)</div>
+        <p style="font-family:'Nunito',sans-serif;font-size:0.83rem;color:#3a2a1a;line-height:1.5;margin:0 0 8px;">Para que esta comunidad funcione, necesito que tengamos claro lo siguiente:</p>
+        <ul style="font-family:'Nunito',sans-serif;font-size:0.83rem;color:#3a2a1a;line-height:1.7;margin:0;padding-left:18px;">
+          <li><strong>No hay una empresa detrás:</strong> Aquí no encontrarás un equipo de I+D, ni programadores de guardia, ni un servicio de soporte 24/7.</li>
+          <li><strong>Es un proyecto unipersonal:</strong> Lo he creado de forma altruista porque creo que es algo positivo para nosotros, pero no puedo garantizar que la web esté libre de errores técnicos o de contenido.</li>
+          <li><strong>Responsabilidad compartida:</strong> Por favor, utiliza la información aquí publicada con precaución. Si detectas un fallo o un dato incorrecto, recuerda que no hay nadie supervisándolo en tiempo real.</li>
+        </ul>
+      </div>
+
+      <!-- Sección petición -->
+      <div style="background:#f0f4ff;border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+        <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:0.88rem;color:#2a3a8a;margin-bottom:8px;">🤝 Mi petición para la comunidad</div>
+        <p style="font-family:'Nunito',sans-serif;font-size:0.83rem;color:#1a2a4a;line-height:1.65;margin:0;">
+          Os pido que utilicéis CeliacosFriends con <strong>respeto y empatía</strong>. He puesto mucho esfuerzo y cariño en levantar esto de la nada para que todos tengamos un lugar donde apoyarnos.
+        </p>
+      </div>
+
+      <!-- Cita final -->
+      <div style="
+        font-family:'Playfair Display',serif;font-size:0.88rem;font-style:italic;
+        color:#2a7a5a;text-align:center;
+        background:linear-gradient(135deg,rgba(58,154,154,0.07),rgba(90,170,106,0.07));
+        border-radius:12px;padding:14px 18px;margin-bottom:16px;
+        border:1px solid rgba(58,154,154,0.15);
+      ">
+        "Hecho por un celíaco, ayudado por la tecnología, para todos vosotros."
+      </div>
+
+      <p style="font-family:'Nunito',sans-serif;font-size:0.83rem;color:#5a7a7a;line-height:1.6;margin:0 0 4px;text-align:center;">
+        Gracias por entender las limitaciones de este proyecto y por formar parte de él.<br>
+        <strong style="color:#1a6a4a;">¡Espero que os sea de gran utilidad!</strong>
+      </p>
+    </div>
+
+    <!-- Botón entrar -->
+    <div style="padding:16px 26px 22px;flex-shrink:0;">
+      <button onclick="cerrarBienvenida()" style="
+        width:100%;padding:13px;border-radius:50px;border:none;
+        font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;cursor:pointer;
+        background:linear-gradient(135deg,#1a6a4a,#2a9a6a,#3aaa5a);
+        color:white;box-shadow:0 4px 16px rgba(42,154,106,0.35);
+        transition:all 0.2s;
+      "
+      onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(42,154,106,0.45)'"
+      onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(42,154,106,0.35)'"
+      >
+        ¡Entrar a la comunidad! 🌿
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// === TABS ===
+function switchTab(n) {
+  const tabs = document.querySelectorAll('.tab');
+  const contents = document.querySelectorAll('.tab-content');
+  tabs.forEach((t,i)=> {
+    t.classList.toggle('active', i===n);
+    contents[i].classList.toggle('active', i===n);
+  });
+}
+
+// === EDIT PROFILE ===
+function openEditProfile() {
+  document.getElementById('edit-overlay').style.display = 'flex';
+  
+  // Focus en el select de ciudad para que el usuario pueda empezar a teclear inmediatamente
+  setTimeout(() => {
+    document.getElementById('edit-city').focus();
+  }, 100);
+}
+
+function closeEditProfile() {
+  document.getElementById('edit-overlay').style.display = 'none';
+}
+
+function saveProfile() {
+  const bio = document.getElementById('edit-bio').value;
+  const city = document.getElementById('edit-city').value;
+  const interests = document.getElementById('edit-interests').value;
+
+  document.getElementById('bio-text').innerText = bio;
+  document.getElementById('city-display').innerHTML = `📍 ${city}, España`;
+  
+  const interestArray = interests.split(',').map(i=>i.trim()).filter(i=>i);
+  document.getElementById('interests-display').innerHTML = interestArray.map(i=>`${getInterestIcon(i)} ${i}`).join(' · ');
+
+  closeEditProfile();
+  showNotification('✅ Perfil actualizado correctamente');
+}
+
+function getInterestIcon(interest) {
+  const icons = {
+    'cine':'🎬','natación':'🏊','lectura':'📚','cocina':'👨‍🍳',
+    'viajes':'✈️','música':'🎵','deporte':'⚽','arte':'🎨'
+  };
+  return icons[interest.toLowerCase()] || '🏷️';
+}
+
+// === KEYBOARD NAVIGATION FOR SELECT ===
+(function() {
+  const citySelect = document.getElementById('edit-city');
+  let searchTimeout;
+  let searchString = '';
+  
+  citySelect.addEventListener('keydown', function(e) {
+    // Solo procesar letras
+    if (e.key.length === 1 && /[a-zA-ZñÑáéíóúÁÉÍÓÚ]/.test(e.key)) {
+      e.preventDefault();
+      
+      // Limpiar el timeout anterior
+      clearTimeout(searchTimeout);
+      
+      // Añadir la letra a la cadena de búsqueda
+      searchString += e.key.toLowerCase();
+      
+      // Buscar la primera opción que coincida
+      const options = Array.from(citySelect.options);
+      const match = options.find(option => 
+        option.text.toLowerCase().startsWith(searchString)
+      );
+      
+      if (match) {
+        citySelect.value = match.value;
+        // Hacer scroll a la opción seleccionada
+        match.scrollIntoView({ block: 'nearest' });
+      }
+      
+      // Resetear la cadena de búsqueda después de 1 segundo
+      searchTimeout = setTimeout(() => {
+        searchString = '';
+      }, 1000);
+    }
+  });
+  
+  // Limpiar la búsqueda cuando se cierra el select
+  citySelect.addEventListener('blur', function() {
+    searchString = '';
+    clearTimeout(searchTimeout);
+  });
+})();
+
+// === ONLINE TOGGLE ===
+let isOnline = true;
+document.getElementById('toggle-online').addEventListener('click', function() {
+  isOnline = !isOnline;
+  const btn = this;
+  const dot = document.getElementById('avatar-dot');
+  const statusText = document.getElementById('status-text');
+
+  if(isOnline) {
+    btn.className = 'paction online-btn';
+    btn.innerHTML = '<span class="status-dot on"></span> Online';
+    dot.className = 'avatar-online';
+    statusText.innerHTML = '🟢 Online ahora';
+    showNotification('🟢 Ahora estás visible como online');
+  } else {
+    btn.className = 'paction offline-btn';
+    btn.innerHTML = '<span class="status-dot off"></span> Offline';
+    dot.className = 'avatar-online offline-indicator';
+    statusText.innerHTML = '⚫ Offline';
+    showNotification('⚫ Ahora estás invisible');
+  }
+});
+
+// === NOTIFICATION ===
+function showNotification(msg) {
+  const bubble = document.getElementById('notif-bubble');
+  bubble.textContent = msg;
+  bubble.classList.add('show');
+  setTimeout(()=> bubble.classList.remove('show'), 2500);
+}
+
+// === MODAL DE BIENVENIDA ===
+(function() {
+  const KEY = 'cf_bienvenida_vista';
+
+  function cerrarBienvenida() {
+    document.getElementById('bienvenida-overlay').style.display = 'none';
+    try { localStorage.setItem(KEY, '1'); } catch(e) {}
+  }
+  window.cerrarBienvenida = cerrarBienvenida;
+
+  // Cerrar con Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const ov = document.getElementById('bienvenida-overlay');
+      if (ov && ov.style.display === 'flex') cerrarBienvenida();
+    }
+  });
+
+  // Mostrar solo si es la primera vez (no ha visto antes el popup)
+  function intentarMostrarBienvenida() {
+    try {
+      if (localStorage.getItem(KEY)) return; // ya la vio → no mostrar
+    } catch(e) {}
+    // Esperar a que la sesión esté lista (DOMContentLoaded + pequeño delay)
+    setTimeout(function() {
+      const ov = document.getElementById('bienvenida-overlay');
+      if (ov) ov.style.display = 'flex';
+    }, 800);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', intentarMostrarBienvenida);
+  } else {
+    intentarMostrarBienvenida();
+  }
+})();
+</script>
+
+</body>
+</html>
