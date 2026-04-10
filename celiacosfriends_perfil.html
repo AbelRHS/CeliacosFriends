@@ -4858,11 +4858,15 @@ async function guardarModificarRestaurante(){
     const { data: { user } } = await _supabase.auth.getUser();
     if (user) {
       const sbid = restModTarget.dataset.sbid || null;
+      console.log('💾 Guardando restaurante en Supabase. sbid:', sbid, 'ciudad:', ciudad);
       if (sbid) {
         const { error } = await _supabase.from('mis_restaurantes').update({
           nombre, direccion: direccion || '', ciudad: ciudad || '', puntuacion, comentario: comentario || ''
         }).eq('id', sbid).eq('user_id', user.id);
-        if (error) console.error('Error actualizando restaurante:', error.message);
+        if (error) console.error('❌ Error actualizando restaurante:', error.message);
+        else console.log('✅ Restaurante actualizado en Supabase con ciudad:', ciudad);
+      } else {
+        console.warn('⚠️ Sin sbid — el restaurante no tiene ID de Supabase, no se puede actualizar en la nube');
       }
     }
   } catch(e) { console.error('Error de conexión al actualizar restaurante:', e); }
@@ -4879,7 +4883,7 @@ async function guardarModificarRestaurante(){
   const subEl=restModTarget.querySelector('[style*="font-size:0.75rem;color:var(--text-light)"]');
   const puntEl=restModTarget.querySelector('[style*="border-radius:50px"]');
   if(nombreEl)nombreEl.textContent=nombre;
-  if(subEl)subEl.textContent=(direccion||'Sin dirección')+subfecha;
+  if(subEl)subEl.textContent=([direccion,ciudad].filter(Boolean).join(' · ')||'Sin dirección')+subfecha;
   if(puntEl&&puntEl.textContent.includes('⭐'))puntEl.textContent='⭐ '+puntuacion.toFixed(1);
 
   cerrarModificarRestaurante();
@@ -4896,6 +4900,7 @@ function abrirDetalleRestaurante(el){
   // Prioridad: _comPostActual.datos > dataset > valores por defecto
   const nombre     = (_d?.nombre && _d.nombre !== '') ? _d.nombre : (el?.dataset?.nombre || '—');
   const direccion  = (_d?.direccion && _d.direccion !== '') ? _d.direccion : (el?.dataset?.direccion || '');
+  const ciudad     = (_d?.ciudad && _d.ciudad !== '') ? _d.ciudad : (el?.dataset?.ciudad || '');
   const fecha      = (_d?.fecha && _d.fecha !== '') ? _d.fecha : (el?.dataset?.fecha || '');
   const puntuacion = (_d?.puntuacion) ? parseFloat(_d.puntuacion) : (parseFloat(el?.dataset?.puntuacion) || 0);
   const comentario = (_d?.comentario && _d.comentario !== '') ? _d.comentario : (el?.dataset?.comentario || '');
@@ -4907,6 +4912,7 @@ function abrirDetalleRestaurante(el){
   if(fecha)tarjetas.push({icon:'\ud83d\udcc5',label:'Cu\u00e1ndo fui',val:fecha});
   if(puntuacion)tarjetas.push({icon:'\u2b50',label:'Satisfacci\u00f3n',val:'\u2b50 '+puntuacion.toFixed(1)+' / 5'});
   if(direccion)tarjetas.push({icon:'\ud83d\udccd',label:'Direcci\u00f3n',val:direccion});
+  if(ciudad)tarjetas.push({icon:'\ud83c\udfd9\ufe0f',label:'Ciudad',val:ciudad});
   const cols=tarjetas.length>1?'1fr 1fr':'1fr';
   const gridHTML=tarjetas.length
     ?`<div style="display:grid;grid-template-columns:${cols};gap:10px;">${tarjetas.map(t=>`<div style="background:var(--bg);border-radius:14px;padding:12px 14px;"><div style="font-size:0.68rem;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">${t.icon} ${t.label}</div><div style="font-size:0.88rem;font-weight:800;color:var(--text);">${t.val}</div></div>`).join('')}</div>`
@@ -11017,6 +11023,7 @@ function _comAbrirDetalle(post) {
     
     const nombre     = datos.nombre || '—';
     const direccion  = datos.direccion || '';
+    const ciudad     = datos.ciudad || '';
     const fecha      = datos.fecha || '';
     const puntuacion = datos.puntuacion || 5;
     const comentario = datos.comentario || '';
@@ -11025,6 +11032,7 @@ function _comAbrirDetalle(post) {
     if (fecha) tarjetas.push({icon: '📅', label: 'Cuándo fui', val: fecha});
     if (puntuacion) tarjetas.push({icon: '⭐', label: 'Satisfacción', val: '⭐ ' + parseFloat(puntuacion).toFixed(1) + ' / 5'});
     if (direccion) tarjetas.push({icon: '📍', label: 'Dirección', val: direccion});
+    if (ciudad) tarjetas.push({icon: '🏙️', label: 'Ciudad', val: ciudad});
     
     const cols = tarjetas.length > 1 ? '1fr 1fr' : '1fr';
     const gridHTML = tarjetas.length
@@ -14483,6 +14491,7 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
         item.className = 'rest-item';
         item.dataset.nombre    = r.nombre || '';
         item.dataset.direccion = r.direccion || '';
+        item.dataset.ciudad    = r.ciudad || '';
         item.dataset.fecha     = r.fecha || '';
         item.dataset.puntuacion = r.puntuacion || 5;
         item.dataset.comentario = r.comentario || '';
@@ -14497,7 +14506,7 @@ document.addEventListener('DOMContentLoaded', function _initPrivacidad() {
             <div style="font-size:1.8rem">🍽️</div>
             <div style="flex:1">
               <div style="font-weight:800;font-size:0.92rem">${r.nombre}</div>
-              <div style="font-size:0.75rem;color:var(--text-light)">${r.direccion||'Sin dirección'}${subfecha}</div>
+              <div style="font-size:0.75rem;color:var(--text-light)">${[r.direccion, r.ciudad].filter(Boolean).join(' · ') || 'Sin dirección'}${subfecha}</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #e8f4f4;">
