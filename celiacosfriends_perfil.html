@@ -1927,32 +1927,48 @@ function verReceta(card) {
   }
 
   document.getElementById('modal-ver-receta').style.display = 'flex';
-  // Mostrar acciones solo en perfil propio
+
+  // Determinar si viene de Comunidad
+  const _vieneDeComunidad = !!_comPostActual && _comPostActual.tipo === 'receta';
+
+  // Botones Modificar/Eliminar: solo en perfil propio y NO desde comunidad
   const accionesR = document.getElementById('acciones-mod-receta');
-  if (accionesR) accionesR.style.display = _esMiPerfil ? 'flex' : 'none';
-  // Mostrar acciones de visitante solo en perfil ajeno
+  if (accionesR) accionesR.style.display = (_esMiPerfil && !_vieneDeComunidad) ? 'flex' : 'none';
+
+  // Botones Me gusta / Guardar: en perfil ajeno O cuando viene de Comunidad
   const accionesV = document.getElementById('acciones-visitante-receta');
   if (accionesV) {
-    accionesV.style.display = _esMiPerfil ? 'none' : 'flex';
-    if (!_esMiPerfil) {
-      // Sincronizar estado del like con la card
+    const mostrarVisitante = !_esMiPerfil || _vieneDeComunidad;
+    accionesV.style.display = mostrarVisitante ? 'flex' : 'none';
+    if (mostrarVisitante) {
       const likeBtn = document.getElementById('vr-like-btn');
-      const cardLikeBtn = vrCardActual?.querySelector('.like-btn');
+      const cardLikeBtn = vrCardActual?.querySelector?.('.like-btn');
       if (likeBtn && cardLikeBtn) {
         const isLiked = cardLikeBtn.classList.contains('liked');
         likeBtn.classList.toggle('liked', isLiked);
         likeBtn.querySelector('.like-heart').textContent = isLiked ? '❤️' : '🤍';
         likeBtn.querySelector('.like-count').textContent = cardLikeBtn.querySelector('.like-count')?.textContent || '0';
         likeBtn.style.borderColor = isLiked ? '#e04444' : '#e0eeee';
+      } else if (likeBtn) {
+        likeBtn.classList.remove('liked');
+        likeBtn.querySelector('.like-heart').textContent = '🤍';
+        likeBtn.querySelector('.like-count').textContent = _vieneDeComunidad ? (_comPostActual?.datos?.likes || '0') : '0';
+        likeBtn.style.borderColor = '#e0eeee';
+        likeBtn.style.background = 'white';
       }
-      // Sincronizar estado del bookmark con la card
       const bkBtn = document.getElementById('vr-bookmark-btn');
-      const cardBkBtn = vrCardActual?.querySelector('.bookmark-btn');
+      const cardBkBtn = vrCardActual?.querySelector?.('.bookmark-btn');
       if (bkBtn && cardBkBtn) {
         const isSaved = cardBkBtn.classList.contains('saved');
         bkBtn.classList.toggle('saved', isSaved);
         bkBtn.style.color = isSaved ? 'var(--gold)' : 'var(--teal-dark)';
         bkBtn.style.borderColor = isSaved ? 'var(--gold)' : '#e0eeee';
+      } else if (bkBtn) {
+        const tituloRec = _vieneDeComunidad ? (_comPostActual?.datos?.titulo || '') : '';
+        const yaGuardado = tituloRec ? _cargarMarcadores().some(m => m.titulo === tituloRec) : false;
+        bkBtn.classList.toggle('saved', yaGuardado);
+        bkBtn.style.color = yaGuardado ? 'var(--gold)' : 'var(--teal-dark)';
+        bkBtn.style.borderColor = yaGuardado ? 'var(--gold)' : '#e0eeee';
       }
     }
   }
@@ -1971,9 +1987,9 @@ function verReceta(card) {
 }
 
 function toggleLikeModalReceta(btn) {
-  if (!vrCardActual) return;
-  const cardLikeBtn = vrCardActual.querySelector('.like-btn');
+  const cardLikeBtn = vrCardActual?.querySelector?.('.like-btn');
   if (cardLikeBtn) {
+    // Receta con card real en el DOM
     toggleLike(cardLikeBtn);
     const isLiked = cardLikeBtn.classList.contains('liked');
     btn.classList.toggle('liked', isLiked);
@@ -1981,15 +1997,50 @@ function toggleLikeModalReceta(btn) {
     btn.querySelector('.like-count').textContent = cardLikeBtn.querySelector('.like-count')?.textContent || '0';
     btn.style.borderColor = isLiked ? '#e04444' : '#e0eeee';
     btn.style.background = isLiked ? '#fff8f8' : 'white';
+  } else if (_comPostActual && _comPostActual.tipo === 'receta') {
+    // Receta abierta desde Comunidad sin card real: toggle local
+    const isLiked = !btn.classList.contains('liked');
+    btn.classList.toggle('liked', isLiked);
+    btn.querySelector('.like-heart').textContent = isLiked ? '❤️' : '🤍';
+    const countEl = btn.querySelector('.like-count');
+    let count = parseInt(countEl?.textContent || '0');
+    count = isLiked ? count + 1 : Math.max(0, count - 1);
+    if (countEl) countEl.textContent = count;
+    btn.style.borderColor = isLiked ? '#e04444' : '#e0eeee';
+    btn.style.background = isLiked ? '#fff8f8' : 'white';
   }
 }
 
 function toggleMarcadorDesdeModal(btn) {
-  if (!vrCardActual) return;
-  const cardBkBtn = vrCardActual.querySelector('.bookmark-btn');
+  const cardBkBtn = vrCardActual?.querySelector?.('.bookmark-btn');
   if (cardBkBtn) {
+    // Receta con card real en el DOM
     toggleMarcador(cardBkBtn);
     const isSaved = cardBkBtn.classList.contains('saved');
+    btn.classList.toggle('saved', isSaved);
+    btn.style.color = isSaved ? 'var(--gold)' : 'var(--teal-dark)';
+    btn.style.borderColor = isSaved ? 'var(--gold)' : '#e0eeee';
+    btn.querySelector('svg').setAttribute('fill', isSaved ? 'currentColor' : 'none');
+  } else if (_comPostActual && _comPostActual.tipo === 'receta') {
+    // Receta abierta desde Comunidad sin card real: guardar/quitar por título
+    const datos = _comPostActual.datos || {};
+    const marcadores = _cargarMarcadores();
+    const idx = marcadores.findIndex(m => m.titulo === datos.titulo);
+    const isSaved = idx === -1; // va a quedar guardado
+    if (isSaved) {
+      marcadores.push({
+        titulo: datos.titulo || '',
+        emoji:  datos.emoji  || '🍽️',
+        color:  datos.color  || 'linear-gradient(135deg,var(--teal),var(--green))',
+        texto:  datos.texto  || '',
+        foto:   datos.foto   || '',
+        autor:  _comPostActual.autor || ''
+      });
+    } else {
+      marcadores.splice(idx, 1);
+    }
+    _guardarMarcadores(marcadores);
+    renderizarMarcadores();
     btn.classList.toggle('saved', isSaved);
     btn.style.color = isSaved ? 'var(--gold)' : 'var(--teal-dark)';
     btn.style.borderColor = isSaved ? 'var(--gold)' : '#e0eeee';
