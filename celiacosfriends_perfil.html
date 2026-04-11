@@ -3914,43 +3914,26 @@ async function guardarViaje() {
     }
     // ── Publicar en comunidad si checkbox marcado (modo modificar) ──
     const cbVMod = document.getElementById('viaje-publicar-comunidad');
-    const yaPublicadoVia = !!(modItemTarget?.dataset?.comSbid);
-    if (cbVMod?.checked && !yaPublicadoVia) {
+    const sbidMod = modItemTarget.dataset.sbid || null;
+    if (sbidMod) {
       try {
         const { data: { user: uMod } } = await _supabase.auth.getUser();
         if (uMod) {
-          const nick = getNickActual() || '';
-          const viajeIdMod = modItemTarget.dataset.sbid || null;
-          
-          // UPSERT para evitar duplicados: si viaje_id ya existe, actualiza
-          const { data: comMod, error: errMod } = await _supabase
-            .from('comunidad_viajes')
-            .upsert([{
-              viaje_id:   viajeIdMod,
-              user_id:    uMod.id,
-              autor_nick: nick,
-              destino,
-              emoji:      emoji || '🌍',
-              fecha,
-              fecha_iso:  fechaRaw || '',
-              duracion:   duracion || '',
-              puntuacion,
-              companeros: companeros || '',
-              restaurantes: restaurantes || '',
-              likes_count: 0
-            }], { 
-              onConflict: 'viaje_id'
-            })
-            .select('id').single();
-          if (errMod) { console.warn('Error publicando viaje (mod) en comunidad:', errMod.message); }
+          const enCom = cbVMod?.checked ? true : false;
+          const { error: errMod } = await _supabase
+            .from('mis_viajes')
+            .update({ en_comunidad: enCom })
+            .eq('id', sbidMod).eq('user_id', uMod.id);
+          if (errMod) { console.warn('Error actualizando en_comunidad (mod):', errMod.message); }
           else {
-            modItemTarget.dataset.comSbid = comMod?.id || '';
-            console.log('✅ Viaje (editado) publicado en comunidad:', comMod?.id);
-            if (typeof añadirPostComunidad === 'function') {
-              añadirPostComunidad({ tipo: 'viaje', id: comMod?.id,
+            modItemTarget.dataset.enComunidad = enCom ? '1' : '0';
+            console.log('✅ Viaje en_comunidad actualizado:', enCom);
+            if (enCom && typeof añadirPostComunidad === 'function') {
+              const nick = getNickActual() || '';
+              añadirPostComunidad({ tipo: 'viaje', id: sbidMod,
                 autor: nick, avatar: '', emoji, puntuacion,
                 titulo: destino, subtitulo: detalles,
-                fecha: fechaRaw, likes: 0, com_sbid: comMod?.id });
+                fecha: fechaRaw, likes: 0, com_sbid: sbidMod });
             }
           }
         }
@@ -4033,44 +4016,28 @@ async function guardarViaje() {
   lista.insertBefore(item, lista.firstChild);
   actualizarContadorViajes();
 
-  // ── Publicar en comunidad_viajes si el checkbox está marcado ──
+  // ── Publicar en comunidad si el checkbox está marcado ──
   const cbViajeCom = document.getElementById('viaje-publicar-comunidad');
-  if (cbViajeCom?.checked && supabaseId) {
+  if (supabaseId) {
     try {
       const { data: { user: uCom } } = await _supabase.auth.getUser();
       if (uCom) {
-        const nick = getNickActual() || '';
-        
-        // UPSERT para evitar duplicados: si viaje_id ya existe, actualiza
-        const { data: comIns, error: comErr } = await _supabase
-          .from('comunidad_viajes')
-          .upsert([{
-            viaje_id:     supabaseId,
-            user_id:      uCom.id,
-            autor_nick:   nick,
-            destino,
-            emoji:        emoji || '🌍',
-            fecha,
-            fecha_iso:    fechaRaw || '',
-            duracion:     duracion || '',
-            puntuacion,
-            companeros:   companeros || '',
-            restaurantes: restaurantes || '',
-            likes_count:  0
-          }], { 
-            onConflict: 'viaje_id'
-          })
-          .select('id').single();
+        const enCom = cbViajeCom?.checked ? true : false;
+        const { error: comErr } = await _supabase
+          .from('mis_viajes')
+          .update({ en_comunidad: enCom })
+          .eq('id', supabaseId).eq('user_id', uCom.id);
         if (comErr) {
           console.warn('Error publicando viaje en comunidad:', comErr.message);
         } else {
-          item.dataset.comSbid = comIns?.id || '';
-          console.log('✅ Viaje publicado en comunidad:', comIns?.id);
-          if (typeof añadirPostComunidad === 'function') {
-            añadirPostComunidad({ tipo: 'viaje', id: comIns?.id,
+          item.dataset.enComunidad = enCom ? '1' : '0';
+          console.log('✅ Viaje en_comunidad:', enCom);
+          if (enCom && typeof añadirPostComunidad === 'function') {
+            const nick = getNickActual() || '';
+            añadirPostComunidad({ tipo: 'viaje', id: supabaseId,
               autor: nick, avatar: '', emoji, puntuacion,
               titulo: destino, subtitulo: detalles,
-              fecha: fechaRaw, likes: 0, com_sbid: comIns?.id });
+              fecha: fechaRaw, likes: 0, com_sbid: supabaseId });
           }
         }
       }
@@ -8114,18 +8081,9 @@ async function eliminarViajeDesdeModal() {
       if (sbid) {
         const { error } = await _supabase.from('mis_viajes').delete().eq('id', sbid).eq('user_id', user.id);
         if (error) console.error('Error eliminando viaje por id:', error.message);
-        // Borrar también de comunidad_viajes si estaba publicado
-        const _rawComSbidV = item.dataset.comSbid;
-        const comSbid = (_rawComSbidV && _rawComSbidV !== 'null' && _rawComSbidV !== 'undefined' && _rawComSbidV.trim() !== '') ? _rawComSbidV.trim() : null;
-        if (comSbid) {
-          await _supabase.from('comunidad_viajes').delete().eq('id', comSbid).eq('user_id', user.id);
-        } else {
-          await _supabase.from('comunidad_viajes').delete().eq('viaje_id', sbid).eq('user_id', user.id);
-        }
       } else if (destino) {
         const { error } = await _supabase.from('mis_viajes').delete().eq('destino', destino).eq('user_id', user.id);
         if (error) console.error('Error eliminando viaje por destino:', error.message);
-        await _supabase.from('comunidad_viajes').delete().eq('destino', destino).eq('user_id', user.id);
       } else {
         console.warn('No se puede eliminar viaje: sin sbid ni destino');
       }
@@ -11520,27 +11478,32 @@ async function _comCargarQuedadasDeSupabase() {
   } catch(e) { console.warn('Error en _comCargarQuedadasDeSupabase:', e); }
 }
 
-// ─── Carga comunidad_viajes desde Supabase ───────────────────────────────────
+// ─── Carga viajes en comunidad desde Supabase ───────────────────────────────
 async function _comCargarViajesDeSupabase() {
   try {
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user) return;
 
     const { data, error } = await _supabase
-      .from('comunidad_viajes')
-      .select('id, viaje_id, user_id, autor_nick, destino, emoji, fecha, puntuacion, duracion, companeros, restaurantes, likes_count, fecha_iso')
-      .order('created_at', { ascending: false })
+      .from('mis_viajes')
+      .select('id, user_id, destino, emoji, fecha, fecha_iso, puntuacion, duracion, companeros, restaurantes, en_comunidad')
+      .eq('en_comunidad', true)
+      .order('fecha_iso', { ascending: false })
       .limit(100);
 
-    if (error) { console.warn('Error cargando comunidad_viajes:', error.message); return; }
+    if (error) { console.warn('Error cargando viajes comunidad:', error.message); return; }
     if (!data || data.length === 0) return;
 
-    // Likes propios
-    const { data: misLikes } = await _supabase
-      .from('comunidad_viajes_likes')
-      .select('com_viaje_id')
-      .eq('user_id', user.id);
-    const misLikesSet = new Set((misLikes || []).map(l => String(l.com_viaje_id)));
+    // Obtener nicks de los autores
+    const userIds = [...new Set(data.map(r => r.user_id).filter(Boolean))];
+    let perfilesMap = {};
+    if (userIds.length > 0) {
+      const { data: perfiles } = await _supabase
+        .from('perfiles')
+        .select('user_id, nick')
+        .in('user_id', userIds);
+      (perfiles || []).forEach(p => { perfilesMap[p.user_id] = p.nick; });
+    }
 
     const list = document.getElementById('com-viajes-list');
     if (!list) return;
@@ -11548,10 +11511,10 @@ async function _comCargarViajesDeSupabase() {
     let insertados = 0;
     data.forEach(r => {
       if (list.querySelector('.com-feed-card[data-com-sbid="' + r.id + '"]')) return;
-      const nick = r.autor_nick || 'Usuario';
+      const nick = perfilesMap[r.user_id] || 'Usuario';
       const inicial = nick.charAt(0).toUpperCase();
-      const yaLiked = misLikesSet.has(String(r.id));
-      const likesCount = r.likes_count || 0;
+      const likesCount = 0;
+      const yaLiked = false;
       const esPropio = r.user_id === user.id;
       const detalles = [r.fecha, r.duracion, r.companeros ? '👥 ' + r.companeros : '', r.restaurantes ? '🍽️ ' + r.restaurantes + ' SG' : ''].filter(Boolean).join(' · ');
 
@@ -11564,7 +11527,7 @@ async function _comCargarViajesDeSupabase() {
       card.dataset.autor        = nick;
       card.dataset.comViajeId   = idStr;
       card.dataset.esPropio     = esPropio ? '1' : '';
-      card.dataset.publicadoEn  = r.publicado_en || r.fecha_iso || '';
+      card.dataset.publicadoEn  = r.fecha_iso || '';
       card.innerHTML =
         '<div class="com-feed-header">' +
           '<div style="font-size:1.5rem;">' + (r.emoji || '🌍') + '</div>' +
@@ -11587,53 +11550,35 @@ async function _comCargarViajesDeSupabase() {
           (esPropio ? '<button class="com-del-viaje" style="margin-left:8px;background:none;border:none;cursor:pointer;font-size:0.8rem;color:#cc4444;padding:3px 6px;border-radius:6px;" title="Eliminar">🗑️</button>' : '') +
         '</div>';
 
-      // Eventos via JS (evita problemas con UUIDs en atributos onclick)
       const likeBtn = card.querySelector('.com-like-viaje');
       if (likeBtn) likeBtn.addEventListener('click', e => { e.stopPropagation(); _comToggleLikeViajeSupabase(likeBtn, idStr); });
       const delBtn = card.querySelector('.com-del-viaje');
-      if (delBtn) delBtn.addEventListener('click', e => { e.stopPropagation(); _comEliminarViajeSupabase(idStr, delBtn); });
+      if (delBtn) delBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        // Al eliminar desde comunidad solo quitamos en_comunidad
+        _supabase.from('mis_viajes').update({ en_comunidad: false }).eq('id', idStr).eq('user_id', user.id)
+          .then(() => { card.remove(); _comUpdateEmptyStates(); });
+      });
       card.onclick = (e) => {
         if (e.target.closest('button')) return;
-        
-        // Extracción SEGURA de datos
-        const destino_val    = (r.destino && r.destino.trim()) ? r.destino : '—';
-        const emoji_val      = (r.emoji && r.emoji.trim()) ? r.emoji : '🌍';
-        const fecha_val      = (r.fecha && r.fecha.trim()) ? r.fecha : '';
-        const puntuacion_val = (r.puntuacion !== undefined && r.puntuacion !== null) ? parseFloat(r.puntuacion) : 5;
-        const duracion_val   = (r.duracion && r.duracion.trim()) ? r.duracion : '';
-        const companeros_val = (r.companeros && r.companeros.trim()) ? r.companeros : '';
-        const restaurantes_val = (r.restaurantes && r.restaurantes.trim()) ? r.restaurantes : '';
-        
-        console.log('DEBUG card.onclick VIAJE - Datos extraídos:', {
-          destino: destino_val,
-          emoji: emoji_val,
-          fecha: fecha_val,
-          puntuacion: puntuacion_val,
-          duracion: duracion_val,
-          companeros: companeros_val,
-          restaurantes: restaurantes_val
-        });
-        
         const postSb = {
           tipo: 'viaje',
           autor: nick,
-          autor_nick: r.autor_nick || nick,
+          autor_nick: nick,
           user_id: r.user_id,
           id: idStr,
           com_sbid: idStr,
           datos: {
-            destino:    destino_val,
-            emoji:      emoji_val,
-            fecha:      fecha_val,
-            puntuacion: puntuacion_val,
-            duracion:   duracion_val,
-            companeros: companeros_val,
-            restaurantes: restaurantes_val,
-            detalles:   r.detalles || ''
+            destino:    r.destino || '—',
+            emoji:      r.emoji || '🌍',
+            fecha:      r.fecha || '',
+            puntuacion: parseFloat(r.puntuacion || 5),
+            duracion:   r.duracion || '',
+            companeros: r.companeros || '',
+            restaurantes: r.restaurantes || '',
+            detalles:   detalles
           }
         };
-        
-        console.log('DEBUG postSb VIAJE asignado:', postSb);
         _comAbrirDetalle(postSb);
       };
 
@@ -11646,7 +11591,7 @@ async function _comCargarViajesDeSupabase() {
       allVj.sort((a,b) => new Date(b.dataset.publicadoEn||0) - new Date(a.dataset.publicadoEn||0));
       allVj.forEach(c => list.appendChild(c));
       _comUpdateEmptyStates();
-      console.log('comunidad_viajes cargados desde Supabase:', insertados);
+      console.log('Viajes comunidad cargados desde Supabase:', insertados);
       setTimeout(_comRenderCajones, 50);
     }
   } catch(e) { console.warn('Error en _comCargarViajesDeSupabase:', e); }
@@ -11954,7 +11899,7 @@ async function _comEliminarViajeSupabase(comViajeId, btn) {
   try {
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user) return;
-    await _supabase.from('comunidad_viajes').delete().eq('id', comViajeId).eq('user_id', user.id);
+    await _supabase.from('mis_viajes').update({ en_comunidad: false }).eq('id', comViajeId).eq('user_id', user.id);
     card?.remove(); _comUpdateEmptyStates(); toast('🗑️ Eliminado del feed de la comunidad');
   } catch(e) { console.warn('Error eliminando viaje comunidad:', e); }
 }
